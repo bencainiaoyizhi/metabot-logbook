@@ -1,0 +1,2473 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://script.google.com https://script.googleusercontent.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0F2019">
+<title>Metabot Logbook</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%2318342A'/%3E%3Cpath d='M7 22.5C7 15 12.8 9.5 20 9.5S33 15 33 22.5z' fill='%236FF0CF'/%3E%3Crect x='16.5' y='22.5' width='7' height='10' rx='2.5' fill='%23CDEFE3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#F2F6F3; --surface:#FFFFFF; --surface-2:#E8EFEA; --ink:#14241D; --ink-2:#4A5D54; --ink-3:#6E8279; --line:#D0DBD4;
+  --accent:#0A7B6F; --accent-2:#07615A; --accent-soft:#D3EDE6; --accent-ink:#FFFFFF;
+  --night:#0F2019; --night-2:#18342A; --night-ink:#E4F3ED; --night-sub:#A6C8BA; --glow:#6FF0CF;
+  --ok:#15803D; --ok-soft:#DDF3E4; --mid:#B45309; --mid-soft:#FCEBD4; --bad:#B42318; --bad-soft:#FBE2DE;
+  --focus:#1D6FE0;
+  --v-discovery:#2F6BD0; --v-innovation:#7A4BCB; --v-impact:#16865A; --v-inclusion:#C4473F; --v-teamwork:#B86E0C; --v-fun:#C23F79;
+  --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0B1511; --surface:#12201A; --surface-2:#1A2B24; --ink:#E2EEE8; --ink-2:#A6BBB1; --ink-3:#80968C; --line:#29413A;
+    --accent:#35C9AF; --accent-2:#5DDAC3; --accent-soft:#143A32; --accent-ink:#04201A;
+    --night:#07110D; --night-2:#12261E; --night-ink:#E2EEE8; --night-sub:#8FB3A5;
+    --ok:#4ADE80; --ok-soft:#12321F; --mid:#F5A524; --mid-soft:#3A2A0E; --bad:#F87171; --bad-soft:#3A1614;
+    --focus:#7FB3FF;
+    --v-discovery:#79A6F2; --v-innovation:#B08CF0; --v-impact:#4CC98F; --v-inclusion:#F08A80; --v-teamwork:#F0B055; --v-fun:#F07FB0;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0B1511; --surface:#12201A; --surface-2:#1A2B24; --ink:#E2EEE8; --ink-2:#A6BBB1; --ink-3:#80968C; --line:#29413A;
+  --accent:#35C9AF; --accent-2:#5DDAC3; --accent-soft:#143A32; --accent-ink:#04201A;
+  --night:#07110D; --night-2:#12261E; --night-ink:#E2EEE8; --night-sub:#8FB3A5;
+  --ok:#4ADE80; --ok-soft:#12321F; --mid:#F5A524; --mid-soft:#3A2A0E; --bad:#F87171; --bad-soft:#3A1614;
+  --focus:#7FB3FF;
+  --v-discovery:#79A6F2; --v-innovation:#B08CF0; --v-impact:#4CC98F; --v-inclusion:#F08A80; --v-teamwork:#F0B055; --v-fun:#F07FB0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin-inline:auto;padding-inline:16px}
+@media (min-width:720px){.wrap{padding-inline:28px}}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0;font-weight:800}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase}
+.muted{color:var(--ink-2)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0;margin:-1px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* header */
+.top{background:var(--night);color:var(--night-ink);position:relative;overflow:hidden}
+.top::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.85;background:
+  radial-gradient(3px 3px at 8% 28%,var(--glow),transparent 70%),
+  radial-gradient(2px 2px at 17% 74%,var(--glow),transparent 70%),
+  radial-gradient(4px 4px at 31% 40%,rgba(111,240,207,.7),transparent 70%),
+  radial-gradient(2px 2px at 46% 18%,var(--glow),transparent 70%),
+  radial-gradient(3px 3px at 58% 80%,rgba(111,240,207,.6),transparent 70%),
+  radial-gradient(2px 2px at 71% 30%,var(--glow),transparent 70%),
+  radial-gradient(5px 5px at 86% 62%,rgba(111,240,207,.45),transparent 70%),
+  radial-gradient(2px 2px at 94% 22%,var(--glow),transparent 70%),
+  radial-gradient(420px 120px at 12% 110%,rgba(111,240,207,.14),transparent 70%)}
+.top-in{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding-block:18px}
+.brand{display:flex;align-items:center;gap:12px;flex:1 1 300px;min-width:0}
+.brand svg{width:42px;height:42px;flex:none;filter:drop-shadow(0 0 10px rgba(111,240,207,.35))}
+.brand h1{font-size:1.55rem;letter-spacing:-.01em}
+.brand .sub{color:var(--night-sub);font-family:var(--f-mono);font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;margin-top:3px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* buttons */
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-weight:700;font-size:.95rem;padding:8px 14px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;min-height:40px;text-decoration:none;line-height:1.2}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{background:var(--accent-2);border-color:var(--accent-2)}
+.btn.danger{color:var(--bad);border-color:var(--bad);background:transparent}
+.btn.small{min-height:32px;padding:5px 10px;font-size:.85rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.top .btn{background:transparent;color:var(--night-ink);border-color:#335446}
+.top .btn:hover{border-color:var(--glow)}
+.top .btn.primary{background:var(--glow);color:#06231B;border-color:var(--glow)}
+.linkbtn{appearance:none;background:none;border:0;padding:0;font:inherit;color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+main{padding-block:24px 64px;display:grid;gap:22px}
+main>*,.tabs-wrap{min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+.panel h3{font-size:1.2rem}
+.sec-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sec-title h2{font-size:1.35rem}
+
+/* home */
+.upnext{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:760px){.upnext{grid-template-columns:1fr}}
+.upnext .big{font-size:2rem;margin-top:4px}
+.upnext .plan-line{margin-top:6px;color:var(--ink-2)}
+.upnext .actions{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+.howto{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:how}
+.howto li{display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:.93rem;color:var(--ink-2)}
+.howto li::before{counter-increment:how;content:counter(how);width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent-2);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:.9rem}
+.howto b{color:var(--ink)}
+
+.slist{display:grid;gap:8px}
+.srow{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;font:inherit;color:inherit}
+.srow:hover{border-color:var(--accent)}
+.srow .n,.srow .t,.srow .d,.srow .mid{display:block}
+.srow .mid{min-width:0}
+.srow .n{font-family:var(--f-display);font-weight:800;font-size:1.9rem;color:var(--accent);text-align:center;font-variant-numeric:tabular-nums;line-height:1}
+.srow .t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srow .d{color:var(--ink-2);font-size:.85rem}
+.srow .meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:560px){.srow{grid-template-columns:48px minmax(0,1fr)}.srow .meta{grid-column:2;justify-content:flex-start}}
+.dots{display:flex;gap:4px}
+.vdots{display:flex;gap:3px}
+.vdot{width:10px;height:10px;border-radius:50%;background:var(--vc)}
+.count-chip{font-family:var(--f-mono);font-size:.72rem;color:var(--ink-2);white-space:nowrap}
+
+.plan{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:6px;align-content:start}
+.pcard.done{border-color:var(--accent);background:linear-gradient(0deg,var(--surface),var(--surface)) padding-box}
+.pcard .ph{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pcard ul{margin:0;padding-left:18px;font-size:.88rem;color:var(--ink-2)}
+.pcard .st{font-size:.8rem;color:var(--ink-3)}
+.pcard.done .st{color:var(--accent)}
+.cvtag{font-family:var(--f-mono);font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--ink-2);white-space:nowrap}
+
+/* avatars */
+.av{--kid:var(--accent);width:28px;height:28px;border-radius:50%;background:var(--kid);color:#fff;display:inline-grid;place-items:center;font-weight:700;font-size:.72rem;flex:none;letter-spacing:.02em}
+.av.lg{width:52px;height:52px;font-size:1.1rem}
+.av.sm{width:22px;height:22px;font-size:.6rem}
+.av.off{opacity:.28}
+.av.full{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--kid)}
+
+/* session */
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.shead .eyebrow{color:var(--accent)}
+.stitle{font-size:2.1rem;margin-top:2px}
+.planline{color:var(--ink-2);margin-top:4px;font-size:.93rem}
+.save{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2);background:var(--surface);cursor:default}
+.save.ok{color:var(--ok);border-color:var(--ok)}
+.save.warn{color:var(--mid);border-color:var(--mid)}
+.save.err{color:var(--bad);border-color:var(--bad);cursor:pointer}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin}
+.tab{appearance:none;font:inherit;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;padding:8px 14px 8px 8px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer;font-weight:700}
+.tab.team{padding-left:14px}
+.tab[aria-selected="true"]{background:var(--surface);border-color:var(--kid,var(--accent));box-shadow:0 0 0 2px color-mix(in srgb,var(--kid,var(--accent)) 25%,transparent)}
+.tab .pr{font-family:var(--f-mono);font-size:.68rem;color:var(--ink-3);font-weight:500}
+.tab .pr.ok{color:var(--ok)}
+.sbody{display:grid;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 22px 22px;border-top:5px solid var(--kid,var(--accent))}
+@media (max-width:560px){.sbody{padding:4px 14px 18px}}
+.kidhead{display:flex;align-items:center;gap:14px;padding-block:18px 14px}
+.kidhead h3{font-size:1.6rem}
+.step{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;padding-block:20px;border-top:1px solid var(--line)}
+@media (max-width:560px){.step{grid-template-columns:32px minmax(0,1fr);gap:10px}}
+.step-n{width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--kid,var(--accent)) 16%,var(--surface));color:var(--kid,var(--accent-2));font-family:var(--f-display);font-weight:800;display:grid;place-items:center;font-size:1.15rem}
+@media (max-width:560px){.step-n{width:30px;height:30px;font-size:.95rem}}
+.step-body{display:grid;gap:10px;min-width:0}
+.step-body h4{font-size:1.25rem}
+.hint{color:var(--ink-2);font-size:.92rem}
+.given{background:var(--surface-2);border-radius:10px;padding:12px 14px;display:grid;gap:4px}
+.given .lab{color:var(--ink-3)}
+.given .txt{font-size:1.05rem;white-space:pre-wrap}
+.given .none{color:var(--ink-3);font-style:italic}
+
+textarea,input[type=text],input[type=number],input[type=date],select{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:92px;resize:vertical;font-size:1.06rem;line-height:1.5}
+textarea.small{min-height:60px;font-size:1rem}
+textarea:focus,input:focus,select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+textarea:disabled,input:disabled,select:disabled{background:var(--surface-2);color:var(--ink-2)}
+.tb{display:grid;gap:4px}
+.lbl{font-weight:700;font-size:.95rem}
+.count{color:var(--ink-3);text-align:right;min-height:1em;font-size:.68rem}
+
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choice{appearance:none;font:inherit;font-weight:700;font-size:1rem;padding:10px 16px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:46px}
+.choice:hover{border-color:var(--ink-3)}
+.choice[aria-pressed="true"].ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.choice[aria-pressed="true"].mid{background:var(--mid-soft);border-color:var(--mid);color:var(--mid)}
+.choice[aria-pressed="true"].bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.choice[aria-pressed="true"].na{background:var(--surface-2);border-color:var(--ink-3);color:var(--ink-2)}
+.choice:disabled{cursor:not-allowed;opacity:.7}
+
+.toggles{display:flex;flex-wrap:wrap;gap:8px}
+.toggle{appearance:none;font:inherit;font-size:.92rem;font-weight:700;padding:7px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.toggle[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-2)}
+.toggle:disabled{cursor:not-allowed}
+
+.values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.values{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.vcard{appearance:none;font:inherit;text-align:left;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);color:var(--ink);cursor:pointer;display:grid;gap:2px;min-height:74px;align-content:start}
+.vcard .vn{font-family:var(--f-display);font-weight:800;font-size:1.08rem;color:var(--vc);display:flex;align-items:center;gap:6px}
+.vcard .vn::before{content:"";width:10px;height:10px;border-radius:50%;border:2px solid var(--vc);flex:none}
+.vcard .vl{font-size:.82rem;color:var(--ink-2);line-height:1.35}
+.vcard[aria-pressed="true"]{border-color:var(--vc);background:var(--surface-2);background:color-mix(in srgb,var(--vc) 12%,var(--surface))}
+.vcard[aria-pressed="true"] .vn::before{background:var(--vc)}
+.vcard:disabled{cursor:not-allowed}
+.vcard:disabled:not([aria-pressed="true"]){opacity:.55}
+
+.starters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.starters .lab{color:var(--ink-3);font-size:.8rem;margin-right:2px}
+.starter{appearance:none;font:inherit;font-size:.86rem;border:1px dashed var(--ink-3);border-radius:999px;padding:4px 11px;background:transparent;color:var(--ink-2);cursor:pointer}
+.starter:hover{border-style:solid;border-color:var(--accent);color:var(--accent-2)}
+
+.mblock{display:grid;gap:10px}
+.media{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.mcard{margin:0;display:grid;gap:6px;align-content:start;background:var(--surface-2);border-radius:10px;padding:8px}
+.mimg{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:7px;overflow:hidden;background:var(--surface)}
+.mimg img{width:100%;height:100%;object-fit:contain;display:block}
+.mimg .kind{position:absolute;left:6px;top:6px;background:rgba(10,24,18,.78);color:#fff;border-radius:4px;padding:2px 6px;font-size:.62rem}
+.mmissing{display:grid;place-items:center;height:100%;color:var(--ink-3);font-size:.85rem;padding:8px;text-align:center}
+.mcard input{font-size:.9rem;padding:7px 9px;border-radius:7px}
+.mrow{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;font-size:.85rem}
+.mctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:.88rem;color:var(--ink-2);cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.mstatus{font-size:.9rem;color:var(--ink-2);min-height:1.2em}
+.mstatus.err{color:var(--bad)}
+.empty{color:var(--ink-3);font-size:.92rem;font-style:italic}
+
+.nextbar{display:flex;justify-content:flex-end;padding-top:18px;border-top:1px solid var(--line)}
+details.example{background:var(--surface-2);border-radius:10px;padding:10px 14px;margin-top:4px}
+details.example summary{cursor:pointer;font-weight:700;color:var(--accent-2)}
+details.example dl{margin:10px 0 0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 14px;font-size:.92rem}
+details.example dt{font-weight:700}
+details.example dd{margin:0;color:var(--ink-2)}
+@media (max-width:560px){details.example dl{grid-template-columns:1fr}details.example dd{margin-bottom:6px}}
+
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:110px 1fr 1fr;gap:12px}
+@media (max-width:640px){.grid2,.grid4{grid-template-columns:1fr}}
+.qs{margin:0;padding-left:20px;color:var(--ink-2);display:grid;gap:4px;font-size:.95rem}
+.ev{display:grid;gap:8px}
+.ev .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ev .row b{min-width:150px;font-size:.9rem}
+.danger-zone{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* dialogs */
+.overlay{position:fixed;inset:0;background:rgba(6,18,13,.55);display:grid;place-items:center;padding:16px;z-index:40}
+.dialog{background:var(--surface);color:var(--ink);border-radius:14px;width:100%;max-width:540px;max-height:calc(100% - 32px);overflow:auto;padding:20px 22px;display:grid;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.dialog.wide{max-width:680px}
+.dhead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dhead h3{font-size:1.3rem}
+.x{appearance:none;border:0;background:transparent;color:var(--ink-2);font-size:1.6rem;line-height:1;cursor:pointer;padding:2px 8px;border-radius:6px}
+.dfoot{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.field{display:grid;gap:4px}
+.field label{font-weight:700;font-size:.9rem}
+.status{font-size:.92rem;color:var(--ink-2);min-height:1.3em}
+.status.err{color:var(--bad)}
+.status.ok{color:var(--ok)}
+.kidedit{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--night);color:var(--night-ink);padding:10px 16px;border-radius:10px;font-size:.92rem;max-width:calc(100% - 32px);z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.notice{border-left:4px solid var(--mid);background:var(--mid-soft);padding:12px 14px;border-radius:8px;color:var(--ink)}
+.danger-zone input{width:90px}
+.toggle.add{border-style:dashed}
+.srow .n,.srow .t,.srow .d,.srow .mid{display:block}
+.loading{color:var(--ink-2);padding:30px 0;text-align:center}
+
+/* ---- v2: standalone page ---- */
+html{-webkit-text-size-adjust:100%}
+body{padding-bottom:env(safe-area-inset-bottom,0px)}
+.top{position:sticky;top:0;z-index:30}
+@media (max-width:600px),(max-height:560px){.top{position:static}}
+.top-in{padding-block:12px 6px}
+.brand{flex:1 1 240px}
+.top-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.top .save{background:transparent;color:var(--night-sub);border-color:#335446}
+.top .save.ok{color:#7FE3B0;border-color:#2F6B52}
+.top .save.warn{color:#F5C46B;border-color:#7A5A22}
+.top .save.err{color:#FF9C92;border-color:#8A3A33}
+.btn.who{min-height:34px;padding:4px 12px 4px 6px;font-size:.88rem}
+.netdot{width:10px;height:10px;border-radius:50%;background:#46D19B;box-shadow:0 0 8px rgba(70,209,155,.7);flex:none}
+.netdot.off{background:#F0A33A;box-shadow:none}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;position:relative}
+.nav::-webkit-scrollbar{display:none}
+.navtab{appearance:none;background:transparent;border:0;border-bottom:3px solid transparent;color:var(--night-sub);font:inherit;font-weight:700;font-size:.98rem;padding:10px 14px 9px;cursor:pointer;white-space:nowrap}
+.navtab:hover{color:var(--night-ink)}
+.navtab[aria-current="page"]{color:var(--night-ink);border-bottom-color:var(--glow)}
+.lock{max-width:460px;margin-inline:auto}
+.lock input{font-size:1.2rem;letter-spacing:.04em}
+.whogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.whobtn{appearance:none;font:inherit;font-weight:700;font-size:1.05rem;display:grid;justify-items:center;gap:8px;padding:16px 10px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.whobtn:hover{border-color:var(--kid,var(--accent))}
+.pagehead{display:grid;gap:6px}
+.pagehead h2{font-size:1.9rem}
+.pagehead p{max-width:70ch}
+.subnav{display:flex;gap:6px;flex-wrap:wrap}
+.chip{appearance:none;font:inherit;font-size:.86rem;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:5px 12px;cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent-2)}
+.ws{display:grid;gap:12px;scroll-margin-top:120px}
+.ws>*,.rec>*,.fgrid>*,.step-body>*,.mblock>*,.panel>*{min-width:0}
+.ws-head{display:grid;gap:6px}
+.ws-head h3{font-size:1.35rem}
+.rubric-hint{font-size:.92rem;color:var(--ink-2);background:var(--surface-2);border-radius:8px;padding:9px 12px;max-width:80ch}
+.recs{display:grid;gap:12px}
+.rec{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:12px;border-left:4px solid var(--kid,var(--line))}
+.rec-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.rec-head b{font-family:var(--f-display);font-size:1.08rem}
+.rec-sub{display:block;color:var(--ink-3);font-size:.84rem;margin-top:2px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px;align-items:start}
+.fgrid .wide,.fgrid .field.wide{grid-column:1/-1}
+.stage{color:var(--accent);margin:4px 0 -4px}
+.confirm{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.9rem}
+.linkbtn.quiet{color:var(--ink-3);font-weight:500}
+.rolebar{display:grid;gap:6px;padding-bottom:14px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+@media (max-width:420px){.mgrid{grid-template-columns:1fr}}
+.mcard2{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:10px}
+.mhead{display:flex;align-items:baseline;gap:8px}
+.mcode{color:var(--accent);font-size:.8rem}
+.mfields{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px}
+.mfields input,.mfields select{padding:7px 8px;font-size:.92rem}
+.tablewrap{overflow-x:auto;max-width:100%}
+.tbl{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+.tbl th{text-align:left;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 8px;border-bottom:1px solid var(--line)}
+.tbl td.zero{color:var(--bad);font-weight:700}
+.contrib td:not(:first-child),.contrib th:not(:first-child){text-align:center}
+.wholine{display:inline-flex;align-items:center;gap:8px}
+.evarea{font-size:1.05rem;margin-top:10px}
+.evrow{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:12px;align-items:start;padding:10px 0;border-top:1px solid var(--line)}
+.evdot{width:12px;height:12px;border-radius:50%;margin-top:5px;background:var(--bad)}
+.evdot.start{background:var(--mid)}
+.evdot.good{background:var(--ok)}
+.evlabel{font-weight:700}
+.evstep{color:var(--ink-3);margin-right:8px;font-size:.68rem}
+.evdetail{color:var(--ink-2);font-size:.9rem}
+.gear{color:var(--accent)}
+.rolegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.rolecard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:2px;font-size:.9rem;color:var(--ink-2)}
+.rolecard b{color:var(--ink)}
+.timing .over{color:var(--bad);font-weight:700}
+.daylist{margin:0;padding-left:20px;display:grid;gap:6px;max-width:80ch}
+.mload{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:.82rem}
+.mimg img[hidden]{display:none}
+.panel .hint{margin:0}
+@media print{.top,.nav{position:static}}
+
+@media (pointer:coarse){input,select,textarea{font-size:16px}}
+
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#18342A"/><path d="M7 22.5C7 15 12.8 9.5 20 9.5S33 15 33 22.5z" fill="#6FF0CF"/><rect x="16.5" y="22.5" width="7" height="10" rx="2.5" fill="#CDEFE3"/><circle cx="14" cy="17.5" r="2" fill="#18342A"/><circle cx="21.5" cy="14.2" r="1.6" fill="#18342A"/><circle cx="26.5" cy="18.8" r="1.4" fill="#18342A"/></svg>
+      <div>
+        <h1 id="brandName">Team Logbook</h1>
+        <div class="sub" id="brandSub">FLL Challenge · BIOGLOW 2026–27</div>
+      </div>
+    </div>
+    <div class="top-right" id="topRight"></div>
+  </div>
+  <nav class="wrap nav" id="nav" aria-label="Logbook sections"></nav>
+</header>
+<main id="main" class="wrap"><div class="loading">Opening the logbook…</div></main>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script src="jspdf.umd.min.js"></script>
+<script src="config.js"></script>
+<script>
+(() => {
+'use strict';
+/* ================= Season reference data ================= */
+const VALUES = [
+  { key:'Discovery',  css:'--v-discovery',  line:'We explore new skills and ideas.',
+    starters:['I found out that ','I learned how to ','I was surprised that '] },
+  { key:'Innovation', css:'--v-innovation', line:'We use creativity and persistence to solve problems.',
+    starters:['We tried a new idea: ','When it did not work, we ','I came up with '] },
+  { key:'Impact',     css:'--v-impact',     line:'We apply what we learn to improve our world.',
+    starters:['This could help ','Our idea matters because ','This is good for nature because '] },
+  { key:'Inclusion',  css:'--v-inclusion',  line:'We respect each other and embrace our differences.',
+    starters:['I listened to ','Everyone got a turn when ','I helped a teammate by '] },
+  { key:'Teamwork',   css:'--v-teamwork',   line:'We are stronger when we work together.',
+    starters:['We worked together when ','My job in the team was ','We fixed a problem together by '] },
+  { key:'Fun',        css:'--v-fun',        line:'We enjoy and celebrate what we do!',
+    starters:['The best part was ','We celebrated when ','I laughed when '] },
+];
+const VMAP = Object.fromEntries(VALUES.map(v => [v.key, v]));
+
+// Team Meeting Guide 2026-27: topic titles from the guide; reflection prompts are our own short versions.
+const PLAN = {
+  1:{ t:['BIOGLOW theme and project exploration','Build the mission models'], cv:'',
+      q:['Which mission model is most interesting to you, and why?','How do the mission models connect to real problems for living things?','How will our team have fun this season?'] },
+  2:{ t:['Tutorial activities (optional)','Training Camp 1: Driving Around','Explore Project Sparks'], cv:'Discovery',
+      q:['What new building or coding skill did you learn today?','Which Project Spark caught your attention?','How could we find out more about it?'] },
+  3:{ t:['Training Camp 2: Playing with Objects','Identify project problem'], cv:'',
+      q:['What do we still need to find out before we pick our problem?','What should our robot stay away from on the field?','Which mission should we try next?'] },
+  4:{ t:['Training Camp 3: Reacting to Lines','Research project solutions'], cv:'',
+      q:['Where will we keep our research notes?','How did testing change your program?','Could the lines on the mat help the robot find its way?'] },
+  5:{ t:['Guided mission','Research project solutions'], cv:'Teamwork',
+      q:['Which expert could we ask about our problem? What would we ask?','How will we share the work on our solution?','What did the guided mission teach you that helps with other missions?'] },
+  6:{ t:['Pseudocode and mission strategy','Develop project solution'], cv:'Innovation',
+      q:['What is our next step for the project solution?','How does writing things down help us in the judging room?','How do our attachments and code fit our mission plan?'] },
+  7:{ t:['Develop robot design','Develop project solution'], cv:'Gracious Professionalism',
+      q:['Can you explain our solution so a younger kid understands it?','Who could give us feedback?','What would you change about the robot or an attachment?'] },
+  8:{ t:['Practice solving robot game missions','Collect feedback on solution'], cv:'Inclusion',
+      q:['What feedback did we get, and what will we change?','How do we choose which missions to try?','In what order will we run the missions?'] },
+  9:{ t:['Iterate and improve robot solution','Iterate and improve project solution'], cv:'Impact',
+      q:['How will we show Core Values at the event?','What is new or different about our solution?','What did we change after testing or feedback?'] },
+  10:{ t:['Iterate and improve robot solution','Plan project presentation'], cv:'Coopertition',
+      q:['How will we know our solution really helps?','What are we most proud of?','What skills have you grown this season?'] },
+  11:{ t:['Plan robot design explanation','Practice project presentation'], cv:'Fun',
+      q:['Which parts of the robot show our design process?','Does our presentation show what everyone did?','What has FLL changed for you?'] },
+  12:{ t:['Practice robot game matches','Practice full presentations'], cv:'',
+      q:['What have we accomplished?','What will we do if a mission fails during a match?','What still needs work before the event?'] },
+};
+const HW = [
+  { k:'done',   label:'Done',        cls:'ok'  },
+  { k:'partly', label:'Partly done', cls:'mid' },
+  { k:'not',    label:'Not yet',     cls:'bad' },
+  { k:'none',   label:'No homework', cls:'na'  },
+];
+const HWL = Object.fromEntries(HW.map(o => [o.k, o.label]));
+const AREAS = [ { k:'robot', label:'Robot & robot game' }, { k:'project', label:'Innovation project' } ];
+const EV_AREAS = [ { k:'rd', label:'Robot Design' }, { k:'ip', label:'Innovation Project' } ];
+const EV_STEPS = ['Identify','Design','Create','Iterate','Communicate'];
+const DID_STARTERS = ['Today I built ','I programmed the robot to ','I tested ','I changed ','I researched ','I drew a sketch of ','I helped my team by '];
+const KID_COLORS = ['#0E8584','#B4457B','#3E6CC8','#BF6D18','#5E8A1F','#8458C4','#B8433A','#2F7FA8'];
+const MAX_VALUES = 3;
+
+// Example team roles (Engineering Notebook, Team Roles page). Descriptions are our short versions.
+const ROLES = [
+  { k:'captain',    label:'Team Captain',       d:'Keeps the session on track and shares progress.' },
+  { k:'designer',   label:'Creative Designer',  d:'Sketches ideas for the team to discuss.' },
+  { k:'researcher', label:'Researcher',         d:'Finds information from different sources.' },
+  { k:'communicator', label:'Communicator',     d:'Plans how we explain our work; writes scripts.' },
+  { k:'pm',         label:'Project Manager',    d:'Watches the time and plans for the event.' },
+  { k:'materials',  label:'Material Manager',   d:'Gets out and puts away the materials.' },
+  { k:'builder',    label:'Builder',            d:'Builds mission models, the robot and attachments.' },
+  { k:'strategist', label:'Mission Strategist', d:'Studies the rulebook and leads mission choices.' },
+  { k:'coder',      label:'Coder',              d:'Writes and runs the robot programs.' },
+];
+const RMAP = Object.fromEntries(ROLES.map(r => [r.k, r]));
+
+// BIOGLOW robot game (Robot Game Rulebook). Kids fill in points and decisions themselves.
+const MISSIONS = [
+  { k:'EQ',  name:'Equipment inspection bonus' },
+  { k:'M01', name:'Drone Survey' },
+  { k:'M02', name:'Exploding Seeds' },
+  { k:'M03', name:'Flip the Rock' },
+  { k:'M04', name:'Lucky Leaves' },
+  { k:'M05', name:'Reaching Roots' },
+  { k:'M06', name:'Leafcutter Frenzy' },
+  { k:'M07', name:'Humongous Fungus' },
+  { k:'M08', name:'Tangled' },
+  { k:'M09', name:'Research Platform' },
+  { k:'M10', name:'Fragile Microhabitats' },
+  { k:'M11', name:'Window to the Past' },
+  { k:'M12', name:'Forest Elder' },
+  { k:'M13', name:'Keystone Species' },
+  { k:'M14', name:'Seeds of Renewal' },
+  { k:'M15', name:'Biocentric Architecture' },
+  { k:'PT',  name:'Precision tokens (keep them!)' },
+];
+
+/* Worksheets. Field types: text, textarea, date, number, select, kids (team members), multi. */
+const SHEETS = {
+  research: { title:'Research log', icon:'R', area:'ip', add:'+ Add a source',
+    hint:'Every book, website, video, expert or trip we learn from. Judges look for clear research from a variety of sources.',
+    fields:[
+      { k:'date', label:'Date', type:'date' },
+      { k:'type', label:'Kind of source', type:'select', options:['Website','Book','Video','Article','Expert (coach set it up)','Field trip','Survey','Other'] },
+      { k:'source', label:'Source (title, website, or the expert’s job)', type:'text', wide:true },
+      { k:'link', label:'Link (optional)', type:'text', wide:true },
+      { k:'learned', label:'What we learned', type:'textarea', wide:true },
+      { k:'by', label:'Found by', type:'kids', wide:true } ],
+    head: r => r.source || 'New source', sub: r => [r.type, r.date && fmtDate(r.date)].filter(Boolean).join(' · ') },
+  ideas: { title:'Ideas and our choice', icon:'I', area:'ip', add:'+ Add an idea',
+    hint:'Brainstorm many ideas first, then choose. Write down why you picked one and not the others.',
+    fields:[
+      { k:'idea', label:'Idea', type:'text', wide:true },
+      { k:'details', label:'How it would work', type:'textarea', wide:true },
+      { k:'status', label:'Status', type:'select', options:['Thinking about it','Chosen','Not chosen'] },
+      { k:'votes', label:'Votes', type:'number' },
+      { k:'why', label:'Why we chose it (or not)', type:'textarea', wide:true },
+      { k:'by', label:'Idea from', type:'kids', wide:true } ],
+    head: r => r.idea || 'New idea', sub: r => r.status || '' },
+  plan: { title:'Project plan', icon:'P', area:'ip', add:'+ Add a step',
+    hint:'The steps to investigate, build, share and improve our solution: who does each step and by when. Coaches say judges often see no plan. Keep this one up to date.',
+    fields:[
+      { k:'step', label:'Step', type:'text', wide:true },
+      { k:'who', label:'Who', type:'kids', wide:true },
+      { k:'due', label:'Finish by', type:'date' },
+      { k:'status', label:'Status', type:'select', options:['To do','Doing','Done'] },
+      { k:'notes', label:'Notes', type:'textarea', wide:true } ],
+    head: r => r.step || 'New step', sub: r => [r.status, r.due && ('by ' + fmtDate(r.due))].filter(Boolean).join(' · ') },
+  prototypes: { title:'Prototype versions', icon:'V', area:'ip', add:'+ Add a version', photos:true,
+    hint:'A model, drawing or other prototype of the solution. Add a new version every time it changes, with a photo.',
+    fields:[
+      { k:'version', label:'Version', type:'text' },
+      { k:'date', label:'Date', type:'date' },
+      { k:'what', label:'What we made', type:'textarea', wide:true },
+      { k:'changed', label:'What changed from the last version, and why', type:'textarea', wide:true },
+      { k:'by', label:'Made by', type:'kids', wide:true } ],
+    head: r => r.version || 'New version', sub: r => r.date ? fmtDate(r.date) : '' },
+  feedback: { title:'Sharing and feedback', icon:'F', area:'ip', add:'+ Add feedback',
+    hint:'Everyone we shared our solution with, what they said, and what we changed. The coach arranges contact with experts; never contact adults you do not know.',
+    fields:[
+      { k:'date', label:'Date', type:'date' },
+      { k:'group', label:'Kind of person or group', type:'select', options:['Expert or professional','People who would use it','Another FLL team','Teacher or school class','Family or friends','Community group','Other'] },
+      { k:'who', label:'Who (their job or group, no full names)', type:'text', wide:true },
+      { k:'how', label:'How we shared it', type:'text', wide:true },
+      { k:'said', label:'What they said', type:'textarea', wide:true },
+      { k:'changed', label:'What we changed because of it', type:'textarea', wide:true },
+      { k:'by', label:'Shared by', type:'kids', wide:true } ],
+    head: r => r.who || r.group || 'New feedback', sub: r => [r.group, r.date && fmtDate(r.date)].filter(Boolean).join(' · ') },
+  resources: { title:'Building and coding resources', icon:'L', area:'rd', add:'+ Add a resource',
+    hint:'Videos, lessons, books or people that helped us build and code. Judges ask how we used resources for our mission strategy.',
+    fields:[
+      { k:'title', label:'Resource', type:'text', wide:true },
+      { k:'type', label:'Kind', type:'select', options:['Video','Lesson or tutorial','Book or booklet','Coach or mentor lesson','Another team','Website','Other'] },
+      { k:'link', label:'Link (optional)', type:'text', wide:true },
+      { k:'usedFor', label:'What it helped us do', type:'textarea', wide:true },
+      { k:'by', label:'Used by', type:'kids', wide:true } ],
+    head: r => r.title || 'New resource', sub: r => r.type || '' },
+  attachments: { title:'Attachments', icon:'A', area:'rd', add:'+ Add an attachment', photos:true,
+    hint:'Each attachment: which missions it is for, what it does, and how it changed. Add photos of each version.',
+    fields:[
+      { k:'name', label:'Name', type:'text' },
+      { k:'missions', label:'Missions (for example M03, M08)', type:'text' },
+      { k:'purpose', label:'What it does and why we built it this way', type:'textarea', wide:true },
+      { k:'changes', label:'Versions and changes', type:'textarea', wide:true },
+      { k:'ideaBy', label:'Idea from', type:'kids', wide:true },
+      { k:'by', label:'Built by', type:'kids', wide:true } ],
+    head: r => r.name || 'New attachment', sub: r => r.missions || '' },
+  programs: { title:'Programs', icon:'C', area:'rd', add:'+ Add a program', photos:true,
+    hint:'Each program: which missions, which sensors, and how it works step by step (pseudocode). Add a photo of the robot path drawing and a screenshot of the code; judges like to see code examples.',
+    fields:[
+      { k:'name', label:'Program name', type:'text' },
+      { k:'missions', label:'Missions', type:'text' },
+      { k:'sensors', label:'Sensors used', type:'multi', options:['Gyro','Color','Distance','Force','Motor degrees','None'], wide:true },
+      { k:'how', label:'How it works (Move 1, Move 2, …)', type:'textarea', wide:true },
+      { k:'ideaBy', label:'Idea from', type:'kids', wide:true },
+      { k:'by', label:'Coded by', type:'kids', wide:true } ],
+    head: r => r.name || 'New program', sub: r => r.missions || '' },
+  tests: { title:'Test log', icon:'T', area:'rd', add:'+ Add a test',
+    hint:'Test, count, change one thing, test again. Judges want to see repeated testing and what we improved because of it.',
+    fields:[
+      { k:'date', label:'Date', type:'date' },
+      { k:'mission', label:'Mission', type:'text' },
+      { k:'program', label:'Program', type:'text' },
+      { k:'attachment', label:'Attachment', type:'text' },
+      { k:'tries', label:'Tries', type:'number' },
+      { k:'successes', label:'Worked', type:'number' },
+      { k:'problem', label:'What went wrong', type:'textarea', wide:true },
+      { k:'change', label:'What we changed next', type:'textarea', wide:true },
+      { k:'by', label:'Tested by', type:'kids', wide:true } ],
+    head: r => [r.mission, r.program].filter(Boolean).join(' · ') || 'New test',
+    sub: r => (num(r.tries) ? `${num(r.successes)}/${num(r.tries)} worked` : '') + (r.date ? ' · ' + fmtDate(r.date) : '') },
+  matches: { title:'Practice matches', icon:'M', area:'rd', add:'+ Add a practice match',
+    hint:'Full 2.5-minute practice runs with the real rules.',
+    fields:[
+      { k:'date', label:'Date', type:'date' },
+      { k:'score', label:'Score', type:'number' },
+      { k:'tokens', label:'Precision tokens left (0–6)', type:'number' },
+      { k:'missions', label:'Missions that scored', type:'text', wide:true },
+      { k:'notes', label:'What we learned', type:'textarea', wide:true },
+      { k:'gp', label:'How we showed Gracious Professionalism (referees score it at every match)', type:'textarea', wide:true },
+      { k:'by', label:'Technicians', type:'kids', wide:true } ],
+    head: r => num(r.score) ? `${num(r.score)} points` : 'New match', sub: r => r.date ? fmtDate(r.date) : '' },
+  stories: { title:'Core Values stories', icon:'S', area:'cv', add:'+ Add a story',
+    hint:'Short true stories judges love: a problem we solved together, helping another team, including everyone.',
+    fields:[
+      { k:'date', label:'Date', type:'date' },
+      { k:'value', label:'Core Value', type:'select', options:['Discovery','Innovation','Impact','Inclusion','Teamwork','Fun','Gracious Professionalism','Coopertition'] },
+      { k:'story', label:'What happened', type:'textarea', wide:true },
+      { k:'by', label:'Who was part of it', type:'kids', wide:true } ],
+    head: r => r.value || 'New story', sub: r => r.date ? fmtDate(r.date) : '' },
+  talk: { title:'Presentation plan', icon:'★', area:'judge', add:'+ Add a part',
+    hint:'Who says what. Innovation Project: 5 minutes, live. Robot Design: 5 minutes. Everyone should speak.',
+    fields:[
+      { k:'part', label:'Part', type:'select', options:['Innovation Project presentation','Robot Design explanation','Final share'] },
+      { k:'order', label:'Order', type:'number' },
+      { k:'topic', label:'What this part covers', type:'text', wide:true },
+      { k:'who', label:'Speaker', type:'kids', wide:true },
+      { k:'seconds', label:'Seconds', type:'number' },
+      { k:'props', label:'Props (model, poster, attachment)', type:'text', wide:true } ],
+    head: r => r.topic || 'New part', sub: r => [r.part, num(r.seconds) ? num(r.seconds) + ' s' : ''].filter(Boolean).join(' · ') },
+  qa: { title:'Practice questions', icon:'?', area:'judge', add:'+ Add a question',
+    hint:'Questions judges might ask, and who answers. Practice until each answer is short and clear.',
+    fields:[
+      { k:'question', label:'Question', type:'text', wide:true },
+      { k:'area', label:'Area', type:'select', options:['Innovation Project','Robot Design','Core Values'] },
+      { k:'answer', label:'Our answer (key points)', type:'textarea', wide:true },
+      { k:'who', label:'Who answers', type:'kids', wide:true } ],
+    head: r => r.question || 'New question', sub: r => r.area || '' },
+};
+
+/* ================= Helpers ================= */
+const $ = (s, r = document) => r.querySelector(s);
+function h(tag, props, ...kids) {
+  const n = document.createElement(tag);
+  if (props) for (const k in props) {
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.slice(0, 2) === 'on' && typeof v === 'function') n.addEventListener(k.slice(2), v);
+    else if (k === 'value' || k === 'checked' || k === 'disabled' || k === 'multiple') n[k] = v;
+    else if (k[0] === '_') n[k] = v;
+    else n.setAttribute(k, v === true ? '' : String(v));
+  }
+  add(n, kids);
+  return n;
+}
+function add(n, kids) {
+  for (const c of kids) {
+    if (c == null || c === false || c === true) continue;
+    if (Array.isArray(c)) add(n, c);
+    else n.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+}
+const isObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
+const clone = o => (o === undefined ? undefined : JSON.parse(JSON.stringify(o)));
+// Same merge rules as the server: objects merge, arrays and values replace, null removes the key.
+function merge(a, b) {
+  const out = isObj(a) ? Object.assign({}, a) : {};
+  if (!isObj(b)) return out;
+  for (const k of Object.keys(b)) {
+    const v = b[k];
+    if (v === null) delete out[k];
+    else if (isObj(v)) out[k] = merge(isObj(out[k]) ? out[k] : {}, v);
+    else out[k] = clone(v);
+  }
+  return out;
+}
+// Combine two patches (keeps null markers so the server still removes those keys).
+function mergePatch(a, b) {
+  const out = isObj(a) ? Object.assign({}, a) : {};
+  for (const k of Object.keys(b)) {
+    const v = b[k];
+    if (isObj(v) && isObj(out[k])) out[k] = mergePatch(out[k], v);
+    else out[k] = clone(v);
+  }
+  return out;
+}
+const getPath = (o, p) => p.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o);
+function setPath(o, p, v) {
+  const ks = p.split('.'); let a = o;
+  for (let i = 0; i < ks.length - 1; i++) { if (!isObj(a[ks[i]])) a[ks[i]] = {}; a = a[ks[i]]; }
+  a[ks[ks.length - 1]] = v;
+}
+const pathObj = (p, v) => { const o = {}; setPath(o, p, v); return o; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const frame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+function todayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function parseDate(s) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+function fmtDate(s, long) {
+  const d = parseDate(s); if (!d) return 'No date';
+  return d.toLocaleDateString('en-US', long ? { weekday:'long', month:'long', day:'numeric', year:'numeric' } : { weekday:'short', month:'short', day:'numeric' });
+}
+const words = s => ((s || '').trim().match(/\S+/g) || []).length;
+const has = s => !!(s && String(s).trim());
+const num = v => { const n = Number(v); return isFinite(n) ? n : 0; };
+const pl = (n, one, many) => `${n} ${n === 1 ? one : (many || one + 's')}`;
+function slug(s, fb) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24) || (fb == null ? 'kid' : fb); }
+function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+const LS = {
+  get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); return true; } catch (_) { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch (_) {} },
+};
+let toastTimer = null;
+function toast(msg, ms = 4200) {
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, ms);
+}
+
+/* ================= State ================= */
+const API_URL = window.LOGBOOK_API || 'PASTE_WEB_APP_URL_HERE';
+const S = {
+  pin: LS.get('mb.pin') || '', role: null, me: LS.get('mb.me') || '', who: LS.get('mb.who') || '',
+  docs: new Map(), since: 0, loaded: false, online: true, lastSync: 0, syncing: false,
+  view: 'home', openId: null, tab: 'team', section: null, confirm: null,
+  thumbs: new Map(), thumbWant: new Set(), ver: 0, setup: { name:'', number:'', coaches:'', kids:['', '', '', ''] },
+};
+const P = new Map();                               // doc path -> changes not yet saved (kept across reloads)
+const Q = { timer:null, inflight:null, failed:false, retries:0, err:'', errCode:'', stuck:new Set() };
+let ptrDown = false, deferred = false;
+
+/* ================= Server calls ================= */
+async function api(action, args, pinOverride) {
+  if (!/^https:\/\//.test(API_URL)) throw { code:'no_api', message:'The logbook is not connected to its Google script yet.' };
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), action === 'upload' || action === 'photo' ? 90000 : 30000);
+  let res;
+  try {
+    const body = JSON.stringify({ pin: pinOverride != null ? pinOverride : S.pin, action, args: args || {} });
+    const keepalive = document.visibilityState === 'hidden' && body.length < 60000;   // lets the last save finish when the iPad is closed
+    res = await fetch(API_URL, { method:'POST', body, signal: ctl.signal, redirect:'follow', keepalive });
+  } catch (e) { throw { code:'network', message:'No connection' }; }
+  finally { clearTimeout(tm); }
+  if (!res.ok) throw { code:'network', message:'HTTP ' + res.status };
+  let j; try { j = await res.json(); } catch (_) { throw { code:'network', message:'Bad reply' }; }
+  if (!j.ok) throw { code: j.error || 'error', message: j.error || 'error' };
+  if (j.role && j.role !== S.role) { S.role = j.role; LS.set('mb.role', j.role); }
+  if (j.me && j.me !== S.me) { S.me = j.me; LS.set('mb.me', j.me); }
+  if (S.role === 'kid' && S.me && S.who !== S.me) { S.who = S.me; LS.set('mb.who', S.me); }   // a kid's device always belongs to that kid
+  return j;
+}
+function authFailed(e) {
+  if (e && e.code === 'locked') {                       // keep the code; just pause
+    S.pausedUntil = Date.now() + 15 * 60000;
+    toast('Someone typed too many wrong codes. The logbook pauses for 15 minutes; nothing typed here is lost.', 8000);
+    return true;
+  }
+  if (e && e.code === 'bad_code') {
+    S.pin = ''; ['mb.pin', 'mb.role', 'mb.me'].forEach(k => LS.del(k)); S.role = null; S.me = '';
+    toast('Your code no longer works. Ask your coach for your code.', 7000);
+    render(); return true;
+  }
+  return false;
+}
+
+/* ================= Local copy of the data ================= */
+const VC = new Map(); let vcVer = -1;
+function bump() { S.ver++; }
+function view(path) {
+  if (vcVer !== S.ver) { VC.clear(); vcVer = S.ver; }
+  if (VC.has(path)) return VC.get(path);
+  const d = S.docs.get(path);
+  let out = d ? d.data : undefined;
+  if (Q.inflight && Q.inflight.path === path) out = merge(out || {}, Q.inflight.patch);
+  if (P.has(path)) out = merge(out || {}, P.get(path));
+  if (out && out._deleted) out = undefined;
+  VC.set(path, out);
+  return out;
+}
+function list(coll) {
+  const depth = coll.split('/').length + 1; const paths = new Set();
+  const take = p => { if (p.startsWith(coll + '/') && p.split('/').length === depth) paths.add(p); };
+  for (const p of S.docs.keys()) take(p);
+  for (const p of P.keys()) take(p);
+  if (Q.inflight) take(Q.inflight.path);
+  const out = [];
+  for (const p of paths) { const d = view(p); if (d) out.push({ id: p.split('/').pop(), path: p, data: d }); }
+  return out;
+}
+function saveCache() {}                                  // entries are not stored on the device (privacy); only unsent changes are
+function loadCache() {
+  LS.del('mb.cache');
+  try {
+    const p = JSON.parse(LS.get('mb.pending') || '[]');
+    if (Array.isArray(p)) p.forEach(([k, v]) => { if (typeof k === 'string' && isObj(v)) P.set(k, v); });
+  } catch (_) {}
+}
+function savePending() {                                // unsent changes, including the one being sent right now
+  const arr = [...P].map(([k, v]) => [k, v]);
+  if (Q.inflight) {
+    const i = arr.findIndex(x => x[0] === Q.inflight.path);
+    if (i >= 0) arr[i] = [arr[i][0], mergePatch(Q.inflight.patch, arr[i][1])]; else arr.push([Q.inflight.path, Q.inflight.patch]);
+  }
+  const ok = arr.length ? LS.set('mb.pending', JSON.stringify(arr)) : (LS.del('mb.pending'), true);
+  if (!ok && !savePending.warned) { savePending.warned = true; toast('This device is out of storage space. Changes only save while the connection works.', 8000); }
+}
+
+/* ================= Saving (per document, merged on the server) ================= */
+let RO = false;                                          // true while drawing a page this person may only read
+function canWrite() { return !!S.role && !RO; }
+function canEditKid(id) { return S.role === 'coach' || (S.role === 'kid' && S.me === id); }
+function saveState() {
+  if (!S.role) return 'readonly';
+  if (Q.stuck.size) return 'error';
+  if (Q.failed && P.size) return Q.errCode === 'network' ? 'offline' : 'error';
+  if (Q.inflight) return 'saving';
+  if (Q.retries > 0 && P.size) return 'retry';
+  if (P.size) return 'unsaved';
+  return 'saved';
+}
+function paintSave() {
+  const p = $('#savepill'); if (!p) return;
+  const map = {
+    saved:['All saved','save ok'], saving:['Saving…','save'], unsaved:['Saving soon…','save'],
+    retry:['No connection, retrying…','save warn'], offline:['Offline · kept on this device','save warn'], error:['Not saved yet · tap to retry','save err'], readonly:['Locked','save warn'],
+  };
+  const st = saveState(); const m = map[st];
+  p.textContent = m[0]; p.className = m[1]; p.title = st === 'error' ? (Q.err || '') : '';
+}
+function schedule(ms) { clearTimeout(Q.timer); Q.timer = setTimeout(flush, ms); }
+function queuePatch(path, patch) {
+  if (!canWrite()) return;
+  P.set(path, mergePatch(P.get(path) || {}, patch));
+  Q.stuck.delete(path);                                 // an edit gives a stuck page another try
+  savePending(); bump(); paintSave();
+  if (!Q.failed) schedule(700);
+}
+function edit(path, field, value) { queuePatch(path, pathObj(field, value)); }
+async function flush() {
+  clearTimeout(Q.timer);
+  if (Q.inflight || !P.size || !S.pin || (S.pausedUntil && Date.now() < S.pausedUntil)) return;
+  const ready = [...P.keys()].filter(k => !Q.stuck.has(k));
+  if (!ready.length) return;
+  const cur = S.view === 'session' && S.openId ? 'sessions/' + S.openId : null;
+  const path = cur && ready.includes(cur) ? cur : ready[0];
+  const patch = P.get(path); P.delete(path);
+  Q.inflight = { path, patch }; savePending(); paintSave();
+  let next = 0;
+  try {
+    const r = await api('patch', { path, patch });
+    const old = S.docs.get(path);
+    if (!old || num(r.t) >= num(old.t)) S.docs.set(path, { data: r.data, t: r.t });
+    Q.failed = false; Q.retries = 0; Q.err = ''; Q.errCode = ''; S.online = true;
+    afterSaved(patch);
+    next = P.size ? 60 : 0;
+  } catch (e) {
+    next = onWriteError(e, path, patch);
+  } finally {
+    Q.inflight = null; savePending(); bump(); paintSave();
+  }
+  if (next) schedule(next);
+}
+function afterSaved(patch) {
+  // A photo's file goes to the Drive trash only after its removal is saved.
+  if (!isObj(patch.media) || S.role !== 'coach') return;   // kids' removals stay in the Drive folder; only the coach empties it
+  for (const id of Object.keys(patch.media)) {
+    if (patch.media[id] && patch.media[id].removed === true) api('trash', { id }).catch(() => {});
+  }
+}
+function onWriteError(e, path, patch) {
+  const code = e && e.code;
+  if (authFailed(e)) { P.set(path, mergePatch(patch, P.get(path) || {})); savePending(); return 0; }
+  if (code === 'coach_only' || code === 'not_yours' || code === 'bad_path' || code === 'bad_patch') {
+    toast(code === 'coach_only' ? 'Only a coach can change that.' : code === 'not_yours' ? 'You can only change your own page.' : 'That change could not be saved.', 6000);
+    return P.size ? 60 : 0;                             // drop it: it can never succeed
+  }
+  P.set(path, mergePatch(patch, P.get(path) || {})); savePending();
+  const transient = code === 'network' || code === 'error' || /Service|timed out|Lock|Exception/i.test((e && e.message) || '');
+  if (!transient) {                                     // e.g. page too long: set it aside, keep saving everything else
+    Q.stuck.add(path); Q.err = (e && e.message) || String(code);
+    toast(code === 'doc_too_large' ? 'One page is too long to save. Shorten some long answers on it.' : 'One change could not be saved (' + code + ').', 8000);
+    return P.size > Q.stuck.size ? 60 : 0;
+  }
+  S.online = false;
+  if (Q.retries < 5) { Q.retries++; return 2000 + Math.random() * 1500; }
+  if (!Q.failed) toast('Changes are not saving right now. They are kept on this device and will save when the connection is back.', 7000);
+  Q.failed = true; Q.err = (e && e.message) || String(code); Q.errCode = 'network';
+  return 15000;                                         // keep retrying in the background
+}
+async function flushAll() {
+  clearTimeout(Q.timer);
+  const run = async () => {
+    const wait = async () => { for (let i = 0; i < 80 && Q.inflight; i++) await sleep(100); };
+    await wait();
+    if (Q.failed) { Q.failed = false; Q.retries = 0; }
+    for (let i = 0; i < 12 && P.size > Q.stuck.size && !Q.failed; i++) { await flush(); await wait(); }
+  };
+  await Promise.race([run(), sleep(4000)]);
+}
+
+/* ================= Sync (every 15 seconds while the page is open) ================= */
+let lastActive = Date.now();
+['pointerdown', 'keydown', 'scroll'].forEach(ev => window.addEventListener(ev, () => { lastActive = Date.now(); }, { passive:true, capture:true }));
+async function sync(force) {
+  if (S.syncing || !S.pin) return;
+  if (S.pausedUntil && Date.now() < S.pausedUntil) return;
+  if (!force && (document.visibilityState === 'hidden' || Date.now() - lastActive > 30 * 60000)) return;   // idle tabs stop polling
+  S.syncing = true;
+  try {
+    const r = await api('sync', { since: S.since });
+    let changed = false;
+    for (const d of r.docs) {
+      const cur = S.docs.get(d.path);
+      if (cur && num(d.t) <= num(cur.t)) continue;           // never let an older copy replace a newer one
+      if (d.data == null) { if (cur) { S.docs.delete(d.path); changed = true; } }
+      else { S.docs.set(d.path, { data: d.data, t: d.t }); changed = true; }
+    }
+    S.since = Math.max(0, num(r.now) - 8000);           // small overlap so no write is missed
+    S.lastSync = Date.now(); S.online = true;
+    const first = !S.loaded; S.loaded = true;
+    S.syncErr = false;
+    if (changed || first) { bump(); softRefresh(); }
+    if (P.size && !Q.inflight) schedule(300);
+  } catch (e) {
+    if (!authFailed(e)) { S.online = false; S.syncErr = true; paintNet(); if (!S.loaded) render(); }
+  } finally { S.syncing = false; }
+}
+function paintNet() {
+  const n = $('#netdot'); if (!n) return;
+  n.className = 'netdot' + (S.online ? '' : ' off');
+  n.title = S.online ? 'Connected' : 'Offline: changes are kept on this device';
+}
+
+/* ================= Redrawing without losing what someone is typing ================= */
+function region(cls, fn, sig) {
+  const n = h('div', { class: cls, 'data-region': '' });
+  const ro = RO;                                          // keep read-only pages read-only when they redraw
+  n._render = (force) => { const prev = RO; RO = ro; try { draw(force); } finally { RO = prev; } };
+  const draw = (force) => {
+    const a = document.activeElement;
+    if (a && n.contains(a) && (a.tagName === 'TEXTAREA' || a.tagName === 'SELECT' || (a.tagName === 'INPUT' && a.type !== 'file' && a.type !== 'checkbox'))) return;
+    const sgn = sig ? sig() : null;
+    if (!force && sig && sgn === n._sig) return;
+    n._sig = sgn;
+    const key = a && n.contains(a) && a.dataset ? a.dataset.key : null;
+    n.replaceChildren(); add(n, [fn()]);
+    if (key) { const f = n.querySelector(`[data-key="${CSS.escape(key)}"]`); if (f) f.focus(); }
+  };
+  n._render(true);
+  return n;
+}
+function isTyping() {
+  const a = document.activeElement;
+  return !!(a && $('#main') && $('#main').contains(a) && (a.tagName === 'TEXTAREA' || a.tagName === 'SELECT' || (a.tagName === 'INPUT' && a.type !== 'file' && a.type !== 'checkbox')));
+}
+function syncFields() {
+  document.querySelectorAll('#main [data-bind]').forEach(n => {
+    if (n === document.activeElement) return;
+    const [path, field] = n.dataset.bind.split('::');
+    const pend = P.get(path);
+    if (pend && getPath(pend, field) !== undefined) return;
+    const v = getPath(view(path), field);
+    const sv = v == null ? '' : String(v);
+    if (n.value !== sv) { n.value = sv; if (n._upd) n._upd(); }
+  });
+}
+function refresh() {                                   // after a click: redraw the small parts that changed
+  document.querySelectorAll('#main [data-region]').forEach(r => r._render && r._render());
+  paintSave();
+}
+function softRefresh() {                               // after new data arrives from other devices
+  if (ptrDown) { deferred = true; return; }
+  const readMostly = S.view === 'home' || S.view === 'judging' || !S.loaded || !team() || !S.who;
+  if (readMostly && !document.querySelector('.dialog') && !isTyping() && !S.confirm) {
+    const y = window.scrollY; render(); window.scrollTo(0, y); return;
+  }
+  renderHeader();
+  syncFields(); refresh();
+}
+let ptrTimer = null;
+const ptrUp = () => { clearTimeout(ptrTimer); ptrDown = false; if (deferred) { deferred = false; setTimeout(softRefresh, 0); } };
+document.addEventListener('pointerdown', () => { ptrDown = true; clearTimeout(ptrTimer); ptrTimer = setTimeout(ptrUp, 1500); }, true);
+['pointerup', 'pointercancel', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, ptrUp, true));
+window.addEventListener('blur', ptrUp);
+
+/* ================= Team data ================= */
+function team() { return view('team/info') || null; }
+function roster() { const t = team(); return t && Array.isArray(t.kids) ? t.kids : []; }
+function activeKids() { return roster().filter(k => k.active !== false); }
+function kidById(id) { return roster().find(k => k.id === id); }
+function kidName(id) { const k = kidById(id); return k ? k.name : ''; }
+function kidColor(kid) { const i = roster().findIndex(k => k.id === (kid && kid.id)); return KID_COLORS[(i < 0 ? 0 : i) % KID_COLORS.length]; }
+function kidShort(name) { const n = String(name || '?').trim(); return (n.slice(0, 1).toUpperCase() + n.slice(1, 2).toLowerCase()) || '?'; }
+function avatar(kid, size) { return h('span', { class: 'av' + (size ? ' ' + size : ''), style: `--kid:${kidColor(kid)}`, 'aria-hidden': 'true' }, kidShort(kid && kid.name)); }
+function meKid() { return kidById(S.who) || null; }
+function namesOf(ids) { return (Array.isArray(ids) ? ids : []).map(kidName).filter(Boolean); }
+
+/* ================= Page frame ================= */
+const NAV = [
+  { v:'home', label:'Sessions' }, { v:'project', label:'Project' }, { v:'robot', label:'Robot' },
+  { v:'team', label:'Team' }, { v:'judging', label:'Judging' },
+];
+function go(v, section) {
+  flush();
+  S.view = v; S.section = section || null; S.confirm = null;
+  if (v !== 'session') S.openId = null;
+  render();
+  if (section) { const el = document.getElementById('sec-' + section); if (el) el.scrollIntoView({ block:'start' }); else window.scrollTo(0, 0); }
+  else window.scrollTo(0, 0);
+}
+function render() {
+  renderHeader();
+  const main = $('#main'); main.replaceChildren();
+  if (!/^https:\/\//.test(API_URL)) { main.append(panel('Not connected yet', 'This logbook page is not linked to its Google script yet. The coach finishes the setup, then this page works.')); return; }
+  if (!S.pin) { main.append(lockCard()); return; }
+  if (!S.loaded) {
+    main.append(S.syncErr
+      ? panel('Can’t reach the logbook', 'Check the Wi-Fi, then try again. Anything you typed on this device is kept and will save later.', h('div', null, h('button', { class:'btn primary', onclick: () => { S.syncErr = false; render(); sync(true); } }, 'Try again')))
+      : h('div', { class:'loading' }, 'Opening the logbook…'));
+    return;
+  }
+  if (!team()) { main.append(S.role === 'coach' ? setupCard() : panel('Almost ready', 'The coach has not added the team yet. Ask your coach to open the logbook with the coach code.')); return; }
+  if (!S.who && S.role === 'kid' && S.me) { S.who = S.me; LS.set('mb.who', S.me); }
+  if (!S.who) { main.append(whoCard()); return; }
+  if (S.view === 'session') renderSession(main);
+  else if (S.view === 'project') renderProject(main);
+  else if (S.view === 'robot') renderRobot(main);
+  else if (S.view === 'team') renderTeam(main);
+  else if (S.view === 'judging') renderJudging(main);
+  else renderHome(main);
+  loadThumbs();
+}
+function renderHeader() {
+  const t = team();
+  $('#brandName').textContent = t && t.name ? `${t.name} Logbook` : 'Team Logbook';
+  $('#brandSub').textContent = [t && t.number ? `Team #${t.number}` : null, 'FLL Challenge', (t && t.season) || 'BIOGLOW 2026–27'].filter(Boolean).join(' · ');
+  const right = $('#topRight'); right.replaceChildren();
+  const nav = $('#nav'); nav.replaceChildren();
+  if (!S.pin || !S.loaded || !team() || !S.who) return;
+  const me = meKid();
+  right.append(
+    h('span', { id:'netdot', class:'netdot' }),
+    h('button', { id:'savepill', class:'save', type:'button', onclick: () => { if (saveState() === 'error' || saveState() === 'offline') { Q.failed = false; Q.retries = 0; flush(); } } }),
+    h('button', { class:'btn who', type:'button', onclick: openWho, title:'Change who is using this device' }, me ? avatar(me, 'sm') : null, me ? me.name : 'Coach / parent'));
+  paintSave(); paintNet();
+  const cur = S.view === 'session' ? 'home' : S.view;
+  NAV.forEach(n => nav.append(h('button', { class:'navtab', type:'button', 'aria-current': cur === n.v ? 'page' : null, onclick: () => go(n.v) }, n.label)));
+}
+function panel(title, text, ...extra) {
+  return h('div', { class:'panel', style:'display:grid;gap:10px' }, h('h3', null, title), text ? h('p', { class:'muted' }, text) : null, extra);
+}
+function field(id, label, input, wide) { return h('div', { class:'field' + (wide ? ' wide' : '') }, h('label', { for:id }, label), input); }
+
+/* ---------- Team code and device owner ---------- */
+function lockCard() {
+  const inp = h('input', { type:'text', id:'code', autocomplete:'off', autocapitalize:'off', spellcheck:'false', placeholder:'Your code' });
+  const st = h('p', { class:'status', role:'status' });
+  const btn = h('button', { class:'btn primary', type:'submit' }, 'Open the logbook');
+  const form = h('form', { class:'panel lock', onsubmit: async e => {
+    e.preventDefault();
+    const code = inp.value.trim(); if (!code) return;
+    btn.disabled = true; st.className = 'status'; st.textContent = 'Checking…';
+    try {
+      await api('ping', {}, code);
+      S.pin = code; LS.set('mb.pin', code);
+      st.textContent = 'Loading…';
+      await sync(true);
+      render();
+    } catch (err) {
+      st.className = 'status err';
+      st.textContent = err.code === 'bad_code' ? 'That code is not right. Check it with your coach.' : err.code === 'locked' ? 'Too many wrong codes. Wait 15 minutes.' : 'Could not reach the logbook. Check the Wi-Fi and try again.';
+      btn.disabled = false;
+    }
+  } },
+    h('h3', null, 'Welcome to the team logbook'),
+    h('p', { class:'muted' }, 'Type your own code from your coach. You only need to do this once on this device. Keep your code secret.'),
+    field('code', 'Your code', inp), h('div', null, btn), st);
+  setTimeout(() => inp.focus(), 30);
+  return form;
+}
+function whoButtons(onPick) {
+  return h('div', { class:'whogrid' },
+    activeKids().map(k => h('button', { class:'whobtn', type:'button', style:`--kid:${kidColor(k)}`, onclick: () => onPick(k.id) }, avatar(k, 'lg'), h('span', null, k.name))),
+    h('button', { class:'whobtn', type:'button', onclick: () => onPick('coach') }, h('span', { class:'av lg', style:'--kid:#56655E' }, '★'), h('span', null, 'Coach or parent')));
+}
+function setWho(id) { S.who = id; LS.set('mb.who', id); }
+function whoCard() {
+  return panel('Who is using this device?', 'Pick your name. The logbook opens your page first.', whoButtons(id => { setWho(id); render(); }));
+}
+function signOut() {
+  ['mb.pin', 'mb.role', 'mb.me', 'mb.who', 'mb.pending'].forEach(k => LS.del(k));
+  S.pin = ''; S.role = null; S.me = ''; S.who = ''; S.docs = new Map(); S.loaded = false; S.thumbs.clear(); P.clear(); bump(); render();
+}
+function openWho() {
+  if (S.role === 'kid') {
+    const me = meKid();
+    const close = dialog('This device', [
+      h('p', null, `This device is signed in as ${me ? me.name : 'you'}. Everything you write here is saved as your work.`),
+      h('div', { class:'dfoot' }, h('button', { class:'btn', onclick: async () => {
+        await flushAll();
+        if (P.size) { close(); toast('Some changes have not saved yet. Connect to the Wi-Fi first, then sign out.', 7000); return; }
+        close(); signOut();
+      } }, 'Sign out of this device'))]);
+    return;
+  }
+  const close = dialog('Who is using this device?', [whoButtons(id => { setWho(id); close(); render(); }),
+    h('p', { class:'hint' }, 'Sharing one device? Pick the name of whoever is typing now.'),
+    h('div', { class:'dfoot' }, h('button', { class:'linkbtn', onclick: async () => {
+      close(); await flushAll();
+      if (P.size) { toast('Some changes have not saved yet. Connect to the Wi-Fi first, then sign out.', 7000); return; }
+      signOut();
+    } }, 'Sign out of this device (removes the coach code)'))]);
+}
+
+/* ---------- Dialogs ---------- */
+function dialog(title, body, wide) {
+  const opener = document.activeElement;
+  const box = h('div', { class:'dialog' + (wide ? ' wide' : ''), role:'dialog', 'aria-modal':'true', 'aria-label': title });
+  const ov = h('div', { class:'overlay', onclick: e => { if (e.target === ov) close(); } }, box);
+  const close = () => { ov.remove(); document.removeEventListener('keydown', onKey, true); if (opener && opener.isConnected && opener.focus) opener.focus(); };
+  const onKey = e => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key !== 'Tab') return;
+    const f = [...box.querySelectorAll('button,input,select,textarea,[tabindex="0"]')].filter(x => !x.disabled && x.getClientRects().length);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (!box.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+  add(box, [h('div', { class:'dhead' }, h('h3', null, title), h('button', { class:'x', 'aria-label':'Close', onclick: close }, '×')), body]);
+  document.body.append(ov); document.addEventListener('keydown', onKey, true);
+  setTimeout(() => { const f = box.querySelector('input:not([type=checkbox]),select,textarea') || box.querySelector('button:not(.x)'); if (f) f.focus(); }, 30);
+  return close;
+}
+
+/* ---------- Team setup and settings (coach) ---------- */
+function setupCard() {
+  const f = S.setup;
+  const inp = (id, get, set, ph) => { const i = h('input', { type:'text', id, placeholder: ph || '' }); i.value = get(); i.addEventListener('input', () => set(i.value)); return i; };
+  const kidInputs = f.kids.map((_, i) => field('su-kid' + i, `Team member ${i + 1}`, inp('su-kid' + i, () => f.kids[i], v => { f.kids[i] = v; })));
+  const st = h('p', { class:'status', role:'status' });
+  const btn = h('button', { class:'btn primary', onclick: async () => {
+    const names = f.kids.map(x => x.trim()).filter(Boolean);
+    if (!has(f.name) || !names.length) { st.textContent = 'Add a team name and at least one team member.'; st.className = 'status err'; return; }
+    queuePatch('team/info', teamDoc({ name:f.name.trim(), number:f.number.trim(), coaches:f.coaches.trim(), coverNote:'' }, names.map(n => ({ name:n }))));
+    btn.disabled = true; await flushAll(); render();
+  } }, 'Save team');
+  return h('section', { class:'panel', style:'display:grid;gap:12px' },
+    h('h3', null, 'Set up your team'),
+    h('p', { class:'muted' }, 'Add the team once. Every session gets a page for each team member.'),
+    h('div', { class:'grid2' }, field('su-name', 'Team name', inp('su-name', () => f.name, v => { f.name = v; })), field('su-num', 'Team number', inp('su-num', () => f.number, v => { f.number = v; }))),
+    field('su-coach', 'Coaches', inp('su-coach', () => f.coaches, v => { f.coaches = v; })),
+    h('div', { class:'grid2' }, kidInputs), h('div', null, btn), st);
+}
+function teamDoc(info, kids) {
+  const used = new Set(kids.filter(k => k.id).map(k => k.id));
+  const out = kids.map(k => {
+    let id = k.id;
+    if (!id) { let base = slug(k.name); if (base === 'team' || base === 'coach') base += '-kid'; id = base; let i = 2; while (used.has(id)) id = base + '-' + i++; used.add(id); }
+    return { id, name: k.name, active: k.active !== false };
+  });
+  return { name: info.name, number: info.number || '', season: info.season || 'BIOGLOW 2026–27', coaches: info.coaches || '', coverNote: info.coverNote || '', kids: out, updatedAt: Date.now() };
+}
+function deletedList() {
+  const gone = [...S.docs.entries()].filter(([p, d]) => d.data && d.data._deleted && (p.startsWith('rec/') || p.startsWith('sessions/')))
+    .sort((a, b) => num(b[1].t) - num(a[1].t)).slice(0, 30);
+  if (!gone.length) return null;
+  const label = (p, d) => {
+    if (p.startsWith('sessions/')) return `Session ${d.num ?? '?'} · ${fmtDate(d.date)}`;
+    const key = p.split('/')[1]; const def = SHEETS[key];
+    return def ? `${def.title}: ${def.head(d)}` : p;
+  };
+  const wrap = h('div', { class:'field' }, h('span', { class:'lbl' }, 'Deleted entries'), h('p', { class:'hint' }, 'Deleted by mistake? Bring it back.'));
+  gone.forEach(([p, d]) => {
+    const b = h('button', { class:'btn small', type:'button', onclick: () => { queuePatch(p, { _deleted: null }); flush(); b.disabled = true; b.textContent = 'Restored'; } }, 'Restore');
+    wrap.append(h('div', { class:'kidedit', style:'grid-template-columns:minmax(0,1fr) auto' }, h('span', null, label(p, d.data)), b));
+  });
+  return wrap;
+}
+function openTeamSettings() {
+  const t = team() || {};
+  const orig = new Map(roster().map(k => [k.id, k.name]));
+  const name = h('input', { type:'text', id:'ts-name', value: t.name || '' });
+  const numI = h('input', { type:'text', id:'ts-num', value: t.number || '' });
+  const season = h('input', { type:'text', id:'ts-season', value: t.season || 'BIOGLOW 2026–27' });
+  const coaches = h('input', { type:'text', id:'ts-coach', value: t.coaches || '' });
+  const note = h('textarea', { id:'ts-note', rows:3, class:'small', maxlength:'300', placeholder:'Example: Every entry was typed by the team members themselves.' });
+  note.value = t.coverNote || '';
+  let kids = clone(roster());
+  const listEl = h('div', { style:'display:grid;gap:8px' });
+  const draw = () => listEl.replaceChildren(...kids.map((k, i) => {
+    const inp = h('input', { type:'text', value: k.name, 'aria-label':`Name of team member ${i + 1}` });
+    inp.addEventListener('input', () => { kids[i].name = inp.value; });
+    return h('div', { class:'kidedit' }, h('span', { class:'av', style:`--kid:${KID_COLORS[i % KID_COLORS.length]}`, 'aria-hidden':'true' }, kidShort(k.name)), inp,
+      h('button', { class:'toggle', type:'button', 'aria-pressed': String(k.active !== false), onclick: () => { kids[i].active = kids[i].active === false; draw(); } }, k.active === false ? 'Hidden' : 'Active'));
+  }));
+  draw();
+  const st = h('p', { class:'status', role:'status' });
+  const save = h('button', { class:'btn primary', onclick: async () => {
+    const out = kids.map(k => Object.assign({}, k, { name: (k.name || '').trim() || (k.id ? (orig.get(k.id) || 'Member') : '') })).filter(k => k.id || has(k.name));
+    if (!has(name.value) || !out.length) { st.textContent = 'Keep a team name and at least one team member.'; st.className = 'status err'; return; }
+    queuePatch('team/info', teamDoc({ name:name.value.trim(), number:numI.value.trim(), season:season.value.trim(), coaches:coaches.value.trim(), coverNote:note.value.trim() }, out));
+    close(); toast('Team saved.'); render();
+  } }, 'Save team');
+  const close = dialog('Team settings', [
+    h('div', { class:'grid2' }, field('ts-name', 'Team name', name), field('ts-num', 'Team number', numI)),
+    h('div', { class:'grid2' }, field('ts-season', 'Season', season), field('ts-coach', 'Coaches', coaches)),
+    field('ts-note', 'Note for the PDF cover (optional)', note),
+    h('div', { class:'field' }, h('span', { class:'lbl' }, 'Team members'),
+      h('p', { class:'hint' }, 'Names can be changed, not removed. A hidden member keeps old entries but gets no page in new sessions.'),
+      listEl, h('div', null, h('button', { class:'btn small', type:'button', onclick: () => { kids.push({ name:'', active:true }); draw(); } }, '+ Add team member'))),
+    deletedList(),
+    st, h('div', { class:'dfoot' }, save)], true);
+}
+
+/* ================= Inputs bound to a document field ================= */
+function fid(path, field) { return 'f-' + (path + '-' + field).replace(/[^A-Za-z0-9_-]/g, '-'); }
+function textBox(path, field, o = {}) {
+  const id = fid(path, field);
+  const ta = h('textarea', { id, rows: o.rows || 3, placeholder: o.placeholder || '', class: o.small ? 'small' : null, maxlength: String(o.max || 1500), 'data-bind': path + '::' + field, disabled: !canWrite() });
+  ta.value = getPath(view(path), field) || '';
+  const cnt = h('div', { class:'count mono', 'aria-hidden':'true' });
+  ta._upd = () => { const w = words(ta.value); cnt.textContent = w ? `${w} word${w === 1 ? '' : 's'}` : ''; };
+  ta.addEventListener('input', () => { edit(path, field, ta.value); ta._upd(); });
+  ta.addEventListener('blur', () => flush());
+  ta._upd();
+  return h('div', { class:'tb' }, o.label ? h('label', { class:'lbl', for:id }, o.label) : null, ta, cnt);
+}
+function lineInput(path, field, type, o = {}) {
+  const id = fid(path, field);
+  const i = h('input', { type, id, placeholder: o.placeholder || '', maxlength: type === 'text' ? String(o.max || 200) : null, min: type === 'number' ? '0' : null, 'data-bind': path + '::' + field, disabled: !canWrite() });
+  const v = getPath(view(path), field); i.value = v == null ? '' : String(v);
+  i.addEventListener(type === 'date' ? 'change' : 'input', () => edit(path, field, type === 'number' ? (i.value === '' ? '' : Number(i.value)) : i.value));
+  i.addEventListener('blur', () => flush());
+  return i;
+}
+function selectInput(path, field, options, o = {}) {
+  const id = fid(path, field);
+  const s = h('select', { id, 'data-bind': path + '::' + field, disabled: !canWrite() }, h('option', { value:'' }, o.blank || 'Choose…'), options.map(x => h('option', { value:x }, x)));
+  s.value = getPath(view(path), field) || '';
+  s.addEventListener('change', () => { edit(path, field, s.value); flush(); refresh(); });
+  return s;
+}
+function chipsInput(path, field, opts, single) {          // opts: [{k, label, node?}]
+  return region('toggles', () => {
+    const cur = getPath(view(path), field);
+    const arr = single ? (cur ? [cur] : []) : (Array.isArray(cur) ? cur : []);
+    return opts.map(o => { const on = arr.includes(o.k);
+      return h('button', { class:'toggle', type:'button', 'data-key': field + '-' + o.k, 'aria-pressed': String(on), disabled: !canWrite(),
+        onclick: () => {
+          if (single) edit(path, field, on ? '' : o.k);
+          else { const c = arr.slice(); const i = c.indexOf(o.k); if (i >= 0) c.splice(i, 1); else c.push(o.k); edit(path, field, c); }
+          refresh();
+        } }, o.node || null, on && !o.node ? '✓ ' + o.label : o.label); });
+  }, () => JSON.stringify([getPath(view(path), field), roster()]));
+}
+function kidsInput(path, field, single) {
+  return chipsInput(path, field, activeKidsPlus(getPath(view(path), field)).map(k => ({ k: k.id, label: k.name, node: avatar(k, 'sm') })), single);
+}
+function activeKidsPlus(v) { const ids = Array.isArray(v) ? v : (v ? [v] : []); return roster().filter(k => k.active !== false || ids.includes(k.id)); }
+function fieldInput(path, f) {
+  let input;
+  if (f.type === 'textarea') return h('div', { class:'field wide' }, h('label', { for: fid(path, f.k) }, f.label), textBox(path, f.k, { rows: 3 }));
+  if (f.type === 'select') input = selectInput(path, f.k, f.options);
+  else if (f.type === 'kids') return h('div', { class:'field' + (f.wide ? ' wide' : '') }, h('span', { class:'lbl' }, f.label), kidsInput(path, f.k));
+  else if (f.type === 'multi') return h('div', { class:'field' + (f.wide ? ' wide' : '') }, h('span', { class:'lbl' }, f.label), chipsInput(path, f.k, f.options.map(x => ({ k:x, label:x }))));
+  else input = lineInput(path, f.k, f.type === 'date' ? 'date' : f.type === 'number' ? 'number' : 'text');
+  return field(fid(path, f.k), f.label, input, f.wide);
+}
+function insertStarter(path, field, text) {
+  const ta = document.getElementById(fid(path, field)); if (!ta || ta.disabled) return;
+  let v = ta.value;
+  if (v && !/\s$/.test(v)) v += /[.!?]$/.test(v.trim()) ? ' ' : '. ';
+  ta.value = v + text; ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+  ta.dispatchEvent(new Event('input'));
+}
+function starterRow(path, field, items, label) {
+  if (!canWrite()) return null;
+  return h('div', { class:'starters' }, h('span', { class:'lab mono' }, label || 'Start with'),
+    items.map(t => h('button', { class:'starter', type:'button', onclick: () => insertStarter(path, field, t) }, t.trim() + '…')));
+}
+function step(n, title, hint, ...content) {
+  return h('section', { class:'step' }, h('div', { class:'step-n', 'aria-hidden':'true' }, String(n)),
+    h('div', { class:'step-body' }, h('h4', null, h('span', { class:'vh' }, `Step ${n}: `), title), hint ? h('p', { class:'hint' }, hint) : null, content));
+}
+function deleteCtl(path, label) {
+  if (!canWrite()) return null;
+  return region('delctl', () => S.confirm === path
+    ? h('span', { class:'confirm' }, h('span', null, 'Delete for good?'),
+        h('button', { class:'btn danger small', 'data-key':'del-yes', onclick: () => { S.confirm = null; queuePatch(path, { _deleted: true }); flush(); refresh(); } }, 'Delete'),
+        h('button', { class:'btn small', 'data-key':'del-no', onclick: () => { S.confirm = null; refresh(); } }, 'Keep'))
+    : h('button', { class:'linkbtn quiet', 'data-key':'del', onclick: () => { S.confirm = path; refresh(); } }, label || 'Delete'),
+  () => String(S.confirm === path));
+}
+
+/* ================= Sessions ================= */
+const SP = id => 'sessions/' + id;
+function sessions() {
+  return list('sessions').map(r => Object.assign({ id: r.id }, r.data))
+    .sort((a, b) => (num(a.num) - num(b.num)) || String(a.date || '').localeCompare(String(b.date || '')) || a.id.localeCompare(b.id));
+}
+function prevOf(id) { const l = sessions(); const i = l.findIndex(x => x.id === id); return i > 0 ? l[i - 1] : null; }
+function nextNum(l) { return l.reduce((m, s) => Math.max(m, num(s.num)), 0) + 1; }
+function nextPlan(l) { const lp = [...l].reverse().find(s => num(s.tmg) > 0); return Math.min(12, lp ? num(lp.tmg) + 1 : nextNum(l)); }
+function hasKidData(s, id) { const k = s && s.kids && s.kids[id]; return !!(k && (has(k.did) || has(k.learned) || k.hw || (k.values && k.values.length))); }
+function sessionKids(s) {
+  const pr = s && s.present;
+  if (!isObj(pr)) return roster().filter(k => k.active !== false || hasKidData(s, k.id));
+  return roster().filter(k => pr[k.id] === true || pr[k.id] === false || hasKidData(s, k.id));
+}
+function isAbsent(s, id) { return !!(s && s.present && s.present[id] === false); }
+function kidProgress(s, kid, prev) {
+  const k = (s.kids && s.kids[kid.id]) || {};
+  const parts = [];
+  if (prev) parts.push(!!k.hw);
+  parts.push(has(k.did));
+  parts.push((k.values || []).length > 0 && has(k.learned));
+  parts.push(has(s.hwNext && s.hwNext[kid.id]));
+  return { done: parts.filter(Boolean).length, total: parts.length };
+}
+function mediaOf(d) {
+  const m = d && d.media; if (!isObj(m)) return [];
+  return Object.keys(m).map(id => Object.assign({ id }, m[id])).filter(x => x && !x.removed).sort((a, b) => (a.at || 0) - (b.at || 0));
+}
+
+function renderHome(main) {
+  const l = sessions();
+  const n = nextNum(l); const last = l[l.length - 1];
+  const today = l.filter(s => s.date === todayStr()).pop();
+  const me = meKid();
+  const tmg = nextPlan(l); const p = PLAN[tmg];
+  main.append(h('section', { class:'panel upnext' },
+    h('div', null,
+      today ? h('div', { class:'mono', style:'color:var(--accent)' }, 'Today') : h('div', { class:'mono', style:'color:var(--accent)' }, l.length ? 'Up next' : 'Start here'),
+      h('h2', { class:'big' }, today ? `Session ${today.num}` : `Session ${n}`),
+      today ? h('p', { class:'plan-line' }, has(today.focus) ? today.focus : (today.tmg && PLAN[today.tmg] ? PLAN[today.tmg].t.join(' · ') : '')) : (p ? h('p', { class:'plan-line' }, `Team Meeting Guide plan, Session ${tmg}: ${p.t.join(' · ')}`) : null),
+      h('div', { class:'actions' },
+        today ? h('button', { class:'btn primary', onclick: () => openSession(today.id, me && sessionKids(today).some(k => k.id === me.id) ? me.id : 'team') }, me ? `Open my page, ${me.name}` : 'Open today’s session')
+              : h('button', { class:'btn primary', onclick: openNewSession }, `+ Start Session ${n}`),
+        !today && last ? h('button', { class:'btn', onclick: () => openSession(last.id) }, `Open Session ${last.num}`) : null,
+        today ? h('button', { class:'btn', onclick: openNewSession }, '+ New session') : null)),
+    h('ol', { class:'howto', 'aria-label':'How a session works' },
+      h('li', null, h('span', null, h('b', null, 'Start of the meeting: '), 'the coach starts the session and picks the plan.')),
+      h('li', null, h('span', null, h('b', null, 'Last 15 minutes: '), 'everyone opens their own page and fills in 5 short steps.')),
+      h('li', null, h('span', null, h('b', null, 'During the week: '), 'add research, tests, attachments and feedback in Project and Robot.')))));
+  if (l.length) {
+    main.append(h('section', { 'aria-labelledby':'lh' },
+      h('div', { class:'sec-title', style:'margin-bottom:10px' }, h('h2', { id:'lh' }, 'Sessions in the logbook'), h('span', { class:'count-chip' }, `${l.length} session${l.length === 1 ? '' : 's'}`)),
+      h('div', { class:'slist' }, [...l].reverse().map(s => sessionRow(s, l)))));
+  }
+  main.append(planSection(l));
+}
+function sessionRow(s, l) {
+  const i = l.findIndex(x => x.id === s.id); const prev = i > 0 ? l[i - 1] : null;
+  const kids = sessionKids(s);
+  const vs = new Set(); kids.forEach(k => ((s.kids && s.kids[k.id] && s.kids[k.id].values) || []).forEach(v => vs.add(v)));
+  const title = has(s.focus) ? s.focus : (s.tmg && PLAN[s.tmg] ? PLAN[s.tmg].t.join(' · ') : 'No focus written yet');
+  const photos = mediaOf(s).length;
+  return h('button', { class:'srow', onclick: () => openSession(s.id) },
+    h('span', { class:'n' }, String(s.num ?? '?')),
+    h('span', { class:'mid' }, h('span', { class:'t' }, title), h('span', { class:'d' }, fmtDate(s.date) + (s.tmg ? ` · plan S${s.tmg}` : ''))),
+    h('span', { class:'meta' },
+      h('span', { class:'dots', title:'Team members who finished their page' }, kids.map(k => {
+        const pr = kidProgress(s, k, prev); const absent = isAbsent(s, k.id);
+        const a = avatar(k, 'sm'); if (absent || pr.done === 0) a.classList.add('off'); else if (pr.done === pr.total) a.classList.add('full');
+        a.title = `${k.name}: ${absent ? 'absent' : pr.done + ' of ' + pr.total + ' steps'}`; return a;
+      })),
+      vs.size ? h('span', { class:'vdots', title:[...vs].join(', ') }, [...vs].filter(v => VMAP[v]).map(v => h('span', { class:'vdot', style:`--vc:var(${VMAP[v].css})` }))) : null,
+      h('span', { class:'count-chip' }, `${photos} photo${photos === 1 ? '' : 's'}`)));
+}
+function planSection(l) {
+  const logged = {};
+  l.forEach(s => { if (s.tmg) (logged[s.tmg] = logged[s.tmg] || []).push(s.num); });
+  return h('section', { 'aria-labelledby':'ph' },
+    h('div', { class:'sec-title', style:'margin-bottom:10px' }, h('h2', { id:'ph' }, 'The 12-session plan'), h('span', { class:'count-chip' }, 'Team Meeting Guide 2026–27')),
+    h('div', { class:'plan' }, Object.keys(PLAN).map(Number).map(k => {
+      const p = PLAN[k]; const lg = logged[k];
+      return h('div', { class:'pcard' + (lg ? ' done' : '') },
+        h('div', { class:'ph' }, h('span', { class:'mono', style:'color:var(--accent)' }, `Session ${k}`), p.cv ? h('span', { class:'cvtag' }, p.cv) : null),
+        h('ul', null, p.t.map(t => h('li', null, t))),
+        h('div', { class:'st' }, lg ? `Logged as Session ${lg.join(', ')}` : 'Not logged yet'));
+    })));
+}
+function openNewSession() {
+  const l = sessions(); const n = nextNum(l);
+  const numI = h('input', { type:'number', id:'ns-num', min:'1', step:'1', value:String(n) });
+  const date = h('input', { type:'date', id:'ns-date', value:todayStr() });
+  const tmg = h('select', { id:'ns-tmg' }, h('option', { value:'0' }, 'Not in the plan'), Object.keys(PLAN).map(k => h('option', { value:k }, `Session ${k}: ${PLAN[k].t.join(' · ')}`)));
+  tmg.value = String(nextPlan(l));
+  const focus = h('input', { type:'text', id:'ns-focus', maxlength:'140', placeholder:'Example: Test the drive base and pick our first 3 missions' });
+  const go1 = h('button', { class:'btn primary', onclick: () => {
+    const id = newId();
+    const present = {};
+    activeKids().forEach(k => { present[k.id] = true; });
+    queuePatch(SP(id), { num: num(numI.value) || n, date: date.value || todayStr(), tmg: num(tmg.value), focus: focus.value.trim(), teamDid:'', reflection:'', present, media:{}, createdAt: Date.now() });
+    close(); flush();
+    const me = meKid(); openSession(id, me ? me.id : 'team');
+  } }, 'Create session');
+  const close = dialog('Start a new session', [
+    h('div', { class:'grid2' }, field('ns-num', 'Session number', numI), field('ns-date', 'Date', date)),
+    field('ns-tmg', 'Follows the Team Meeting Guide plan', tmg),
+    field('ns-focus', 'Today’s focus (optional)', focus),
+    h('div', { class:'dfoot' }, go1)]);
+}
+function openSession(id, tab) {
+  flush();
+  if (!view(SP(id))) { toast('That session is not available.'); return; }
+  S.view = 'session'; S.openId = id; S.confirm = null;
+  const s = view(SP(id));
+  const me = meKid();
+  S.tab = tab || (me && sessionKids(s).some(k => k.id === me.id) ? me.id : 'team');
+  render(); window.scrollTo(0, 0);
+}
+function renderSession(main) {
+  const path = SP(S.openId); const s = view(path);
+  if (!s) { main.append(panel('This session is not available', 'It may have been deleted.')); return; }
+  const p = s.tmg && PLAN[s.tmg];
+  main.append(h('div', { class:'shead' },
+    h('div', null,
+      h('div', { class:'eyebrow mono', id:'sdate' }, fmtDate(s.date, true)),
+      h('h2', { class:'stitle', id:'snum' }, `Session ${s.num ?? ''}`),
+      p ? h('p', { class:'planline' }, `Plan: Team Meeting Guide Session ${s.tmg} · ${p.t.join(' · ')}`) : null),
+    h('button', { class:'btn', onclick: () => go('home') }, '← All sessions')));
+  const kidsIn = sessionKids(s);
+  if (S.tab !== 'team' && !kidsIn.some(k => k.id === S.tab)) S.tab = 'team';
+  main.append(region('tabs-wrap', () => tabsView(), tabsSig));
+  const body = h('div', { class:'sbody', id:'tabpanel', role:'tabpanel', 'aria-labelledby':'tab-' + S.tab });
+  main.append(body);
+  const kid = kidsIn.find(k => k.id === S.tab);
+  if (kid) renderKidTab(body, kid); else renderTeamTab(body);
+}
+function tabsSig() {
+  const s = view(SP(S.openId)); if (!s) return '';
+  const prev = prevOf(S.openId);
+  return S.tab + '|' + sessionKids(s).map(k => { const pr = kidProgress(s, k, prev); return [k.id, k.name, isAbsent(s, k.id), pr.done, pr.total].join(':'); }).join(',');
+}
+function tabsView() {
+  const s = view(SP(S.openId)); if (!s) return null;
+  const prev = prevOf(S.openId);
+  const ids = ['team'].concat(sessionKids(s).map(k => k.id));
+  const onKey = e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const i = ids.indexOf(S.tab); const j = (i + (e.key === 'ArrowRight' ? 1 : -1) + ids.length) % ids.length;
+    switchTab(ids[j], true);
+  };
+  const tab = (id, content, style) => h('button', { class:'tab' + (id === 'team' ? ' team' : ''), role:'tab', id:'tab-' + id, 'aria-controls':'tabpanel', 'aria-selected': String(S.tab === id), tabindex: S.tab === id ? '0' : '-1', style, 'data-key':'tab-' + id, onclick: () => switchTab(id) }, content);
+  return h('div', { class:'tabs', role:'tablist', 'aria-label':'Pages in this session', onkeydown: onKey },
+    tab('team', 'Team page'),
+    sessionKids(s).map(k => {
+      const absent = isAbsent(s, k.id); const pr = kidProgress(s, k, prev); const done = pr.done === pr.total && !absent;
+      return tab(k.id, [avatar(k), k.name, h('span', { class:'pr' + (done ? ' ok' : '') }, absent ? 'absent' : (done ? '✓ done' : `${pr.done}/${pr.total}`))], `--kid:${kidColor(k)}`);
+    }));
+}
+function switchTab(id, focusTab) {
+  if (S.tab === id) return;
+  flush();
+  S.tab = id; S.confirm = null; render();
+  if (focusTab) { const t = document.getElementById('tab-' + id); if (t) t.focus(); }
+  else { const t = document.querySelector('.tabs'); if (t) t.scrollIntoView({ block:'start', behavior:'smooth' }); }
+}
+function toggleIn(path, field, key, max) {
+  const c = (getPath(view(path), field) || []).slice(); const i = c.indexOf(key);
+  if (i >= 0) c.splice(i, 1); else if (!max || c.length < max) c.push(key);
+  edit(path, field, c); refresh();
+}
+function renderKidTab(body, kid) {
+  const prevRO = RO; RO = !canEditKid(kid.id);
+  try { renderKidTabInner(body, kid); } finally { RO = prevRO; }
+}
+function renderKidTabInner(body, kid) {
+  const path = SP(S.openId); const s = view(path); const base = 'kids.' + kid.id;
+  body.setAttribute('style', `--kid:${kidColor(kid)}`);
+  if (isAbsent(s, kid.id)) {
+    body.append(h('div', { class:'kidhead' }, avatar(kid, 'lg'), h('div', null, h('h3', null, `${kid.name}’s page`), h('p', { class:'muted' }, `${kid.name} is marked absent today.`))),
+      canWrite() ? h('div', { style:'padding-bottom:10px' }, h('button', { class:'btn', onclick: () => { edit(path, 'present.' + kid.id, true); render(); } }, `${kid.name} is here after all`)) : null);
+    return;
+  }
+  const prev = prevOf(S.openId);
+  body.append(h('div', { class:'kidhead' }, avatar(kid, 'lg'),
+    h('div', null, h('h3', null, `${kid.name}’s page`), h('p', { class:'muted' }, RO ? `Only ${kid.name} can change this page. You can read it.` : 'About 3 minutes. Write full sentences, like you are telling a judge what you did.'))));
+  body.append(h('div', { class:'rolebar' }, h('span', { class:'lbl' }, 'My job today'),
+    chipsInput(path, base + '.role', ROLES.map(r => ({ k:r.k, label:r.label })), true)));
+
+  const hwGiven = prev ? h('div', { class:'given' },
+      h('span', { class:'lab mono' }, `Your homework from Session ${prev.num}`),
+      has(prev.hwNext && prev.hwNext[kid.id]) ? h('span', { class:'txt' }, prev.hwNext[kid.id]) : h('span', { class:'none' }, 'No homework was written down for you.'),
+      has(prev.hwNext && prev.hwNext.team) ? [h('span', { class:'lab mono', style:'margin-top:6px' }, 'Team homework'), h('span', { class:'txt' }, prev.hwNext.team)] : null)
+    : h('p', { class:'hint' }, 'This is the first session in the logbook, so there is no homework to check yet.');
+  body.append(step(1, 'Homework check', prev ? 'Did you finish it?' : null, hwGiven,
+    prev ? region('choices', () => HW.map(o => h('button', { class:'choice ' + o.cls, type:'button', 'data-key':'hw-' + o.k, 'aria-pressed': String((getPath(view(path), base + '.hw') || '') === o.k), disabled: !canWrite(),
+      onclick: () => { const cur = getPath(view(path), base + '.hw') || ''; edit(path, base + '.hw', cur === o.k ? '' : o.k); refresh(); } }, o.label)),
+      () => String(getPath(view(path), base + '.hw') || '')) : null,
+    prev ? textBox(path, base + '.hwNote', { small:true, rows:2, max:400, placeholder:'What did you do or bring? (optional)' }) : null));
+
+  body.append(step(2, 'What I did today', 'Build, program, test, research, draw… What happened?',
+    chipsInput(path, base + '.areas', AREAS.map(a => ({ k:a.k, label:a.label }))),
+    starterRow(path, base + '.did', DID_STARTERS),
+    textBox(path, base + '.did', { rows:4, placeholder:'Example: I built a pusher arm. We tested it 5 times and it worked 3 times, so I made the arm longer.' })));
+
+  body.append(step(3, 'What I learned: Core Values', `Pick 1 or 2 Core Values you used today (up to ${MAX_VALUES}). Then tell how.`,
+    region('values', () => { const cur = getPath(view(path), base + '.values') || [];
+      return VALUES.map(v => { const on = cur.includes(v.key);
+        return h('button', { class:'vcard', type:'button', style:`--vc:var(${v.css})`, 'data-key':'v-' + v.key, 'aria-pressed': String(on), disabled: !canWrite() || (!on && cur.length >= MAX_VALUES),
+          onclick: () => toggleIn(path, base + '.values', v.key, MAX_VALUES) }, h('span', { class:'vn' }, v.key), h('span', { class:'vl' }, v.line)); }); },
+      () => JSON.stringify(getPath(view(path), base + '.values') || [])),
+    region('starters-l', () => { const cur = getPath(view(path), base + '.values') || [];
+      const items = cur.length ? cur.flatMap(k => (VMAP[k] ? VMAP[k].starters : [])) : VALUES.map(v => v.starters[0]);
+      return starterRow(path, base + '.learned', items, cur.length ? 'Start with' : 'Ideas'); }, () => JSON.stringify(getPath(view(path), base + '.values') || [])),
+    textBox(path, base + '.learned', { rows:4, placeholder:'What did you learn? How did you show this Core Value?' })));
+
+  body.append(step(4, 'My photos & sketches', 'Take a photo of what you built, or of a sketch you drew on paper. Write one line about each.', mediaBlock(path, kid.id)));
+  body.append(step(5, 'My homework for next time', 'What will you do before the next session? Ask your team if you are not sure.',
+    textBox(path, 'hwNext.' + kid.id, { small:true, rows:2, max:400, placeholder:'Example: Draw the new arm with measurements.' })));
+  body.append(exampleBox());
+  const l = sessionKids(s).filter(k => !isAbsent(s, k.id));
+  const i = l.findIndex(k => k.id === kid.id); const nxt = l[i + 1];
+  body.append(h('div', { class:'nextbar' },
+    h('span', { class:'hint' }, 'Worked on research, a test or an attachment today? Add it in Project or Robot too.'),
+    RO ? null : nxt && S.role === 'coach' && !meKid() ? h('button', { class:'btn primary', onclick: () => switchTab(nxt.id) }, `Done! Next: ${nxt.name} →`)
+        : h('button', { class:'btn primary', onclick: () => { flush(); toast('Saved. Great job!'); go('home'); } }, 'Done!')));
+}
+function exampleBox() {
+  return h('details', { class:'example' }, h('summary', null, 'See a good example (made-up teammate “Alex”)'),
+    h('dl', null,
+      h('dt', null, 'Homework'), h('dd', null, 'Done. “I built Model 05 at home and took a photo holding it.”'),
+      h('dt', null, 'What I did'), h('dd', null, '“I built a pusher arm for the Forest Elder mission. We tested it 5 times and it worked 3 times. The arm was too short, so I added a longer beam.”'),
+      h('dt', null, 'Core Values'), h('dd', null, 'Innovation, Teamwork. “When the arm did not work, we changed one thing at a time and did not give up. My teammate held the robot while I measured.”'),
+      h('dt', null, 'Photo'), h('dd', null, 'The arm before and after the change, with a caption for each.'),
+      h('dt', null, 'My homework'), h('dd', null, '“Draw the new arm with measurements.”')));
+}
+function renderTeamTab(body) {
+  const path = SP(S.openId); const s = view(path);
+  body.setAttribute('style', '');
+  const p = s.tmg && PLAN[s.tmg];
+  const numI = lineInput(path, 'num', 'number');
+  numI.addEventListener('input', () => { const e = $('#snum'); if (e && numI.value) e.textContent = `Session ${numI.value}`; });
+  const date = lineInput(path, 'date', 'date');
+  date.addEventListener('change', () => { const e = $('#sdate'); if (e && date.value) e.textContent = fmtDate(date.value, true); });
+  const tmg = h('select', { id: fid(path, 'tmg'), 'data-bind': path + '::tmg', disabled: !canWrite() }, h('option', { value:'0' }, 'Not in the plan'), Object.keys(PLAN).map(k => h('option', { value:k }, `Session ${k}: ${PLAN[k].t.join(' · ')}`)));
+  tmg.value = String(s.tmg || 0);
+  tmg.addEventListener('change', () => { edit(path, 'tmg', num(tmg.value)); flush(); render(); });
+  body.append(h('div', { class:'kidhead' }, h('div', null, h('h3', null, 'Team page'), h('p', { class:'muted' }, 'Fill this together. One person types, everyone helps.'))));
+  body.append(step(1, 'Session details', null,
+    h('div', { class:'grid4' }, field(fid(path, 'num'), 'Number', numI), field(fid(path, 'date'), 'Date', date), field(fid(path, 'tmg'), 'Plan', tmg)),
+    field(fid(path, 'focus'), 'Today’s focus', lineInput(path, 'focus', 'text', { placeholder:'One line: what is today mainly about?', max:140 }))));
+  body.append(step(2, 'Who is here today', 'Tap a name to mark someone absent.',
+    region('toggles', () => {
+      const d = view(path); const inS = sessionKids(d);
+      const extra = activeKids().filter(k => !inS.some(x => x.id === k.id));
+      return [
+        inS.map(k => { const here = !isAbsent(d, k.id);
+          const undo = d.added && d.added[k.id] && !hasKidData(d, k.id) && canWrite()
+            ? h('button', { class:'toggle', type:'button', 'data-key':'undo-' + k.id, onclick: () => { edit(path, 'present.' + k.id, null); edit(path, 'added.' + k.id, null); refresh(); } }, `Undo adding ${k.name}`) : null;
+          return [h('button', { class:'toggle', type:'button', 'data-key':'pr-' + k.id, 'aria-pressed': String(here), disabled: !canWrite(),
+            onclick: () => { edit(path, 'present.' + k.id, !here); refresh(); } }, avatar(k, 'sm'), here ? k.name : `${k.name} (absent)`), undo]; }),
+        extra.map(k => h('button', { class:'toggle add', type:'button', 'data-key':'add-' + k.id, disabled: !canWrite(),
+          onclick: () => { edit(path, 'present.' + k.id, true); edit(path, 'added.' + k.id, true); refresh(); } }, `+ Add ${k.name} to this session`)),
+      ];
+    }, () => JSON.stringify([getPath(view(path), 'present'), getPath(view(path), 'added'), roster()]))));
+  body.append(step(3, 'What we did as a team', 'A short summary of the whole session.',
+    textBox(path, 'teamDid', { rows:4, max:2000, placeholder:'Example: We tested the new drive base on the mat and picked 3 missions to try first. Then we read about animals that glow.' })));
+  body.append(step(4, 'Team reflection', p ? 'Talk about these questions together, then write the team’s answers.' : 'Pick a plan session above to see reflection questions.',
+    p ? h('ul', { class:'qs' }, p.q.map(q => h('li', null, q))) : null,
+    p && p.cv ? h('p', { class:'hint' }, `Theme to talk about in this plan session: ${p.cv}.`) : null,
+    textBox(path, 'reflection', { rows:4, max:2000, placeholder:'Our answers…' })));
+  body.append(step(5, 'Team photos & sketches', 'The field, a test run, a whiteboard, a group shot.', mediaBlock(path, 'team')));
+  body.append(step(6, 'Team homework for next time', 'Everyone writes their own homework on their page. Put shared homework here.',
+    textBox(path, 'hwNext.team', { small:true, rows:2, max:400, placeholder:'Example: Everyone brings one fact about a glowing animal or fungus.' })));
+  if (S.role === 'coach') {
+    body.append(step(7, 'For coaches: judging evidence', 'Tag what this session shows. The PDF builds an evidence index from these tags.',
+      h('div', { class:'ev' }, EV_AREAS.map(a => h('div', { class:'row' }, h('b', null, a.label),
+        chipsInput(path, 'evidence', EV_STEPS.map(st => ({ k:`${a.k}:${st}`, label:st }))))))));
+    body.append(sessionDeleteZone(path, s));
+  }
+}
+function sessionDeleteZone(path, s) {
+  const zone = h('div', { class:'danger-zone nextbar', style:'justify-content:flex-start' });
+  const reset = () => zone.replaceChildren(h('button', { class:'linkbtn', style:'color:var(--bad)', onclick: ask }, 'Delete this session…'));
+  function ask() {
+    const t = String(s.num);
+    const inp = h('input', { type:'text', inputmode:'numeric', 'aria-label':`Type ${t} to confirm` });
+    const del = h('button', { class:'btn danger small', disabled:true, onclick: () => { queuePatch(path, { _deleted:true }); flush(); toast('Session deleted.'); go('home'); } }, 'Delete for good');
+    inp.addEventListener('input', () => { del.disabled = inp.value.trim() !== t; });
+    zone.replaceChildren(h('span', null, `This removes Session ${t} from the logbook. Type ${t} to confirm:`), inp, del, h('button', { class:'btn small', onclick: reset }, 'Cancel'));
+    inp.focus();
+  }
+  reset(); return zone;
+}
+
+/* ================= Photos ================= */
+function mediaBlock(path, by) {
+  const status = h('p', { class:'mstatus', role:'status' });
+  const grid = region('media-wrap', () => mediaCards(path, by), () => JSON.stringify([S.confirm, mediaOf(view(path)).filter(m => !by || m.by === by)]));
+  let controls = null;
+  if (canWrite()) {
+    const key = fid(path, by || 'all');
+    const clean = h('input', { type:'checkbox', id:'clean-' + key, checked:true });
+    const mk = (kind, label) => {
+      const inp = h('input', { type:'file', accept:'image/*', multiple:true, class:'vh', tabindex:'-1',
+        onchange: async e => { const files = [...e.target.files]; e.target.value = ''; if (files.length) await addFiles(files, kind, path, by, status, clean.checked); refresh(); } });
+      return h('label', { class:'btn', tabindex:'0', role:'button', onkeydown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); } } }, inp, label);
+    };
+    controls = h('div', { class:'mctl' }, mk('photo', '+ Add photo'), mk('sketch', '+ Add sketch'),
+      h('label', { class:'chk', for:'clean-' + key }, clean, 'Make sketches black & white'));
+  }
+  return h('div', { class:'mblock' }, grid, controls, status);
+}
+function mediaCards(path, by) {
+  const items = mediaOf(view(path)).filter(m => !by || m.by === by);
+  if (!items.length) return h('p', { class:'empty' }, 'No photos or sketches yet.');
+  requestThumbs(items.map(m => m.id));
+  return h('div', { class:'media' }, items.map(m => {
+    const cap = h('input', { type:'text', maxlength:'150', placeholder:'What does it show?', 'aria-label':'Caption', disabled: !canWrite(), 'data-key':'cap-' + m.id, 'data-bind': path + '::media.' + m.id + '.caption' });
+    cap.value = m.caption || '';
+    cap.addEventListener('input', () => edit(path, 'media.' + m.id + '.caption', cap.value));
+    cap.addEventListener('blur', () => flush());
+    const ck = path + '#' + m.id;
+    const ctl = !canWrite() ? h('span') : S.confirm === ck
+      ? h('span', { class:'confirm' },
+          h('button', { class:'btn danger small', 'data-key':'rm-yes-' + m.id, onclick: () => { S.confirm = null; edit(path, 'media.' + m.id + '.removed', true); flush(); refresh(); } }, 'Remove'),
+          h('button', { class:'btn small', 'data-key':'rm-no-' + m.id, onclick: () => { S.confirm = null; refresh(); } }, 'Keep'))
+      : h('button', { class:'linkbtn quiet', 'data-key':'rm-' + m.id, onclick: () => { S.confirm = ck; refresh(); } }, 'Remove');
+    const src = S.thumbs.get(m.id);
+    const img = h('img', { alt: m.caption || (m.kind === 'sketch' ? 'Sketch' : 'Photo'), 'data-thumb': m.id, src: src || null, hidden: !src });
+    const who = m.by && m.by !== 'team' ? kidName(m.by) : '';
+    return h('figure', { class:'mcard' },
+      h('div', { class:'mimg' }, img, src ? null : h('span', { class:'mload', 'data-thumbwait': m.id }, 'Loading photo…'),
+        h('span', { class:'kind mono' }, (m.kind === 'sketch' ? 'Sketch' : 'Photo') + (who && !by ? ' · ' + who : ''))),
+      cap, h('div', { class:'mrow' }, ctl));
+  }));
+}
+let thumbTimer = null;
+function requestThumbs(ids) { ids.forEach(id => { if (!S.thumbs.has(id)) S.thumbWant.add(id); }); clearTimeout(thumbTimer); thumbTimer = setTimeout(loadThumbs, 150); }
+async function loadThumbs() {
+  const wantAll = [...S.thumbWant].filter(id => !S.thumbs.has(id));
+  const ids = wantAll.slice(0, 80);
+  S.thumbWant = new Set(wantAll.slice(80));
+  if (S.thumbWant.size) setTimeout(loadThumbs, 400);
+  if (!ids.length || !S.pin) return;
+  try {
+    const r = await api('thumbs', { ids });
+    ids.forEach(id => S.thumbs.set(id, (r.thumbs || {})[id] || ''));
+  } catch (_) { return; }
+  ids.forEach(id => {
+    const src = S.thumbs.get(id);
+    document.querySelectorAll(`img[data-thumb="${CSS.escape(id)}"]`).forEach(img => { if (src) { img.src = src; img.hidden = false; } });
+    document.querySelectorAll(`[data-thumbwait="${CSS.escape(id)}"]`).forEach(el => { if (src) el.remove(); else el.textContent = 'Photo saved (no preview)'; });
+  });
+}
+function decodeImage(blob) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(blob); const img = new Image();
+    img.onload = () => res({ img, w: img.naturalWidth, h: img.naturalHeight, done: () => URL.revokeObjectURL(url) });
+    img.onerror = () => { URL.revokeObjectURL(url); rej(Object.assign(new Error('decode'), { code:'decode' })); };
+    img.src = url;
+  });
+}
+function drawTo(src, sw, sh, maxSide, bw) {
+  const r = Math.min(1, maxSide / Math.max(sw, sh));
+  const w = Math.max(1, Math.round(sw * r)), hh = Math.max(1, Math.round(sh * r));
+  const c = document.createElement('canvas'); c.width = w; c.height = hh;
+  const x = c.getContext('2d');
+  x.fillStyle = '#ffffff'; x.fillRect(0, 0, w, hh);
+  x.drawImage(src, 0, 0, w, hh);
+  if (bw) {                                             // pencil sketch: grey + more contrast (done by hand; iPad Safari has no canvas filters)
+    const img = x.getImageData(0, 0, w, hh); const px = img.data;
+    for (let i = 0; i < px.length; i += 4) {
+      let v = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+      v = (v - 128) * 1.4 + 128 + 18; v = v < 0 ? 0 : v > 255 ? 255 : v;
+      px[i] = px[i + 1] = px[i + 2] = v;
+    }
+    x.putImageData(img, 0, 0);
+  }
+  return { canvas: c, w, h: hh };
+}
+async function toJpeg(blob, maxSide, bw) {
+  const d = await decodeImage(blob);
+  try { if (!d.w || !d.h) throw Object.assign(new Error('decode'), { code:'decode' }); return drawTo(d.img, d.w, d.h, maxSide, bw); }
+  finally { d.done(); }
+}
+async function addFiles(files, kind, path, by, status, clean) {
+  status.className = 'mstatus';
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    status.textContent = `Adding ${kind} ${i + 1} of ${files.length}…`;
+    try {
+      const full = await toJpeg(f, 1600, kind === 'sketch' && clean);
+      const data = full.canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+      const small = drawTo(full.canvas, full.w, full.h, 320, false);
+      let thumb = small.canvas.toDataURL('image/jpeg', 0.6);
+      if (thumb.length > 45000) thumb = small.canvas.toDataURL('image/jpeg', 0.4);
+      const r = await api('upload', { data, thumb, name: kind });
+      S.thumbs.set(r.id, thumb);
+      queuePatch(path, { media: { [r.id]: { kind, by: by || (meKid() ? S.who : 'team'), caption:'', w: full.w, h: full.h, at: Date.now() } } });
+      refresh();
+    } catch (e) {
+      status.className = 'mstatus err';
+      status.textContent = uploadError(e, f);
+      return;
+    }
+  }
+  flush();
+  status.textContent = files.length > 1 ? `Added ${files.length} images. Now write a caption for each.` : 'Added. Now write a caption.';
+}
+function uploadError(e, f) {
+  const code = e && e.code; const nm = f && f.name ? `“${f.name}”` : 'This file';
+  if (code === 'decode') return `${nm} could not be opened. Try taking the photo again, or save it as JPEG.`;
+  if (code === 'photo_too_large') return `${nm} is too big. Try a smaller photo.`;
+  if (code === 'network') return 'The photo was not saved: no connection. Check the Wi-Fi and add it again.';
+  return 'The photo was not saved. Try again.';
+}
+
+/* ================= Worksheets ================= */
+function sortRecs(key, items) {
+  if (key === 'plan') return items.sort((a, b) => String(a.data.due || '9').localeCompare(String(b.data.due || '9')) || (a.data.at || 0) - (b.data.at || 0));
+  if (key === 'talk') return items.sort((a, b) => String(a.data.part || '').localeCompare(String(b.data.part || '')) || num(a.data.order) - num(b.data.order) || (a.data.at || 0) - (b.data.at || 0));
+  if (key === 'qa') return items.sort((a, b) => (a.data.at || 0) - (b.data.at || 0));
+  return items.sort((a, b) => String(b.data.date || '').localeCompare(String(a.data.date || '')) || (b.data.at || 0) - (a.data.at || 0));
+}
+function recs(key) { return sortRecs(key, list('rec/' + key)); }
+function sheetSection(key, extraTop) {
+  const def = SHEETS[key]; const coll = 'rec/' + key;
+  const listEl = region('recs', () => {
+    const items = recs(key);
+    if (!items.length) return h('p', { class:'empty' }, 'Nothing here yet.');
+    return items.map(r => recordCard(key, def, r.path));
+  }, () => recs(key).map(r => r.id).join(','));
+  return h('section', { class:'ws', id:'sec-' + key },
+    h('div', { class:'ws-head' }, h('h3', null, def.title), h('p', { class:'rubric-hint' }, def.hint)),
+    extraTop || null, listEl,
+    canWrite() ? h('div', null, h('button', { class:'btn', onclick: () => addRecord(key) }, def.add)) : null);
+}
+function recordCard(key, def, path) {
+  return region('rec', () => {
+    const d = view(path); if (!d) return null;
+    const sub = def.sub ? def.sub(d) : '';
+    return [
+      h('div', { class:'rec-head' }, h('div', null, h('b', null, def.head(d)), sub ? h('span', { class:'rec-sub' }, sub) : null), deleteCtl(path)),
+      h('div', { class:'fgrid' }, def.fields.map(f => fieldInput(path, f))),
+      def.photos ? mediaBlock(path, null) : null,
+    ];
+  }, () => JSON.stringify([view(path), S.confirm === path]));
+}
+function addRecord(key) {
+  const def = SHEETS[key]; const id = newId(); const path = 'rec/' + key + '/' + id;
+  const init = { at: Date.now() };
+  if (def.fields.some(f => f.k === 'date')) init.date = todayStr();
+  const kf = def.fields.find(f => f.type === 'kids');
+  if (kf && meKid()) init[kf.k] = [S.who];
+  queuePatch(path, init);
+  refresh();
+  setTimeout(() => { const el = document.querySelector(`[data-bind^="${CSS.escape(path)}::"]`); if (el) { el.scrollIntoView({ block:'center' }); el.focus(); } }, 50);
+}
+function subnav(items) {
+  return h('nav', { class:'subnav', 'aria-label':'Sections' }, items.map(([k, label]) => h('button', { class:'chip', type:'button', onclick: () => { const el = document.getElementById('sec-' + k); if (el) el.scrollIntoView({ block:'start', behavior:'smooth' }); } }, label)));
+}
+function singleSection(key, title, hint, path, fields) {
+  return h('section', { class:'ws', id:'sec-' + key },
+    h('div', { class:'ws-head' }, h('h3', null, title), hint ? h('p', { class:'rubric-hint' }, hint) : null),
+    h('div', { class:'rec' }, h('div', { class:'fgrid' }, fields.map(f => fieldInput(path, f)))));
+}
+function pageHead(title, text) { return h('div', { class:'pagehead' }, h('h2', null, title), text ? h('p', { class:'muted' }, text) : null); }
+
+function renderProject(main) {
+  main.append(pageHead('Innovation Project', 'Identify a problem that puts biodiversity at risk and design an innovative solution. Judges score each step below.'));
+  main.append(subnav([['problem','Problem'],['research','Research'],['ideas','Ideas'],['plan','Plan'],['solution','Solution'],['prototypes','Prototypes'],['feedback','Feedback'],['summary','Summary']]));
+  main.append(singleSection('problem', 'Our problem', 'Identify: a clearly defined problem. Fill this in around Session 3.', 'ws/ip', [
+    { k:'problem.statement', label:'Problem statement (one or two sentences)', type:'textarea' },
+    { k:'problem.why', label:'Why it matters for biodiversity', type:'textarea' },
+    { k:'problem.who', label:'Who or what is affected, and where', type:'textarea' } ]));
+  main.append(sheetSection('research'));
+  main.append(sheetSection('ideas'));
+  main.append(sheetSection('plan'));
+  main.append(singleSection('solution', 'Our solution', 'Create: explain what is new about the idea (the innovation) and how it helps.', 'ws/ip', [
+    { k:'solution.name', label:'Name of our solution', type:'text', wide:true },
+    { k:'solution.what', label:'What it does', type:'textarea' },
+    { k:'solution.innovative', label:'What is new or different about it', type:'textarea' },
+    { k:'solution.impact', label:'How it helps biodiversity and people', type:'textarea' },
+    { k:'solution.users', label:'Who would use it', type:'textarea' } ]));
+  main.append(sheetSection('prototypes'));
+  main.append(sheetSection('feedback'));
+  main.append(singleSection('summary', 'Project summary', 'Before the event: our whole project in about five sentences (problem, research, solution, feedback, impact).', 'ws/ip', [
+    { k:'summary.text', label:'Summary', type:'textarea' } ]));
+}
+
+function missionSig() { return JSON.stringify(MISSIONS.map(m => view('missions/' + m.k)).concat([roster()])); }
+function renderRobot(main) {
+  main.append(pageHead('Robot Design', 'How we chose missions, built, coded, tested and improved. Judges score the process, not only the score.'));
+  main.append(subnav([['robot','Our robot'],['strategy','Mission strategy'],['resources','Resources'],['attachments','Attachments'],['programs','Programs'],['tests','Tests'],['matches','Practice matches'],['process','Process & lessons']]));
+  main.append(h('section', { class:'ws', id:'sec-robot' },
+    h('div', { class:'ws-head' }, h('h3', null, 'Our robot'), h('p', { class:'rubric-hint' }, 'The robot itself: which drive base, why we chose it, and how it changed. Add photos of each version.')),
+    h('div', { class:'rec' }, h('div', { class:'fgrid' }, [
+      { k:'robot.base', label:'Our drive base (for example: Advanced Driving Base, or our own design)', type:'text', wide:true },
+      { k:'robot.why', label:'Why we chose or designed it this way', type:'textarea' },
+      { k:'robot.changes', label:'How it changed during the season, and why', type:'textarea' },
+      { k:'robot.by', label:'Built by', type:'kids', wide:true } ].map(f => fieldInput('ws/rd', f))), mediaBlock('ws/rd', null))));
+  const crit = singleSection('criteria', 'How we decide', 'Identify: define your own rules for easy, close and worth it. Coaches say judges ask exactly this.', 'ws/rd', [
+    { k:'criteria.easy', label:'What makes a mission “easy” for us?', type:'textarea' },
+    { k:'criteria.close', label:'What counts as “close” to home?', type:'textarea' },
+    { k:'criteria.points', label:'How much do points matter?', type:'textarea' },
+    { k:'criteria.tie', label:'What do we do when a mission is easy but low scoring, or far but high scoring?', type:'textarea' },
+    { k:'runs.plan', label:'Our runs: which missions go together in each launch', type:'textarea' } ]);
+  main.append(crit);
+  main.append(h('section', { class:'ws', id:'sec-strategy' },
+    h('div', { class:'ws-head' }, h('h3', null, 'Mission strategy'), h('p', { class:'rubric-hint' }, 'Read the Robot Game Rulebook, then fill in each mission yourselves: points, difficulty, distance, and whether we try it.')),
+    region('missions', () => h('div', { class:'mgrid' }, MISSIONS.map(m => missionCard(m))), missionSig)));
+  main.append(sheetSection('resources'));
+  main.append(sheetSection('attachments'));
+  main.append(sheetSection('programs'));
+  main.append(sheetSection('tests', region('testsum', testSummary, () => JSON.stringify(recs('tests').map(r => [r.data.mission, r.data.tries, r.data.successes, r.data.date])))));
+  main.append(sheetSection('matches', region('matchsum', () => {
+    const m = recs('matches'); if (!m.length) return null;
+    const best = Math.max(...m.map(r => num(r.data.score)));
+    return h('p', { class:'hint' }, `Best practice score so far: ${best} points (${m.length} practice match${m.length === 1 ? '' : 'es'}).`);
+  }, () => JSON.stringify(recs('matches').map(r => r.data.score)))));
+  main.append(singleSection('process', 'Our design process and lessons learned', 'Communicate: before the event, explain how we went from reading the rules to our robot today, and what we learned on the way.', 'ws/rd', [
+    { k:'summary.process', label:'Our process, step by step', type:'textarea' },
+    { k:'summary.lessons', label:'The most important things we learned', type:'textarea' },
+    { k:'summary.proud', label:'What we are most proud of', type:'textarea' } ]));
+}
+function missionCard(m) {
+  const path = 'missions/' + m.k;
+  return h('article', { class:'mcard2' },
+    h('div', { class:'mhead' }, h('span', { class:'mcode mono' }, m.k), h('b', null, m.name)),
+    h('div', { class:'mfields' },
+      field(fid(path, 'attempt'), 'Try it?', selectInput(path, 'attempt', ['Yes','Maybe','Not now'])),
+      field(fid(path, 'points'), 'Points', lineInput(path, 'points', 'number')),
+      field(fid(path, 'difficulty'), 'Difficulty', selectInput(path, 'difficulty', ['Easy','Medium','Hard'])),
+      field(fid(path, 'distance'), 'Distance', selectInput(path, 'distance', ['Near','Middle','Far'])),
+      field(fid(path, 'run'), 'Run #', lineInput(path, 'run', 'text', { max:10 }))),
+    h('div', { class:'field' }, h('span', { class:'lbl' }, 'Owner'), kidsInput(path, 'owner')),
+    field(fid(path, 'notes'), 'Notes', lineInput(path, 'notes', 'text', { max:200 }), true));
+}
+function testStats() {
+  const by = {};
+  recs('tests').forEach(r => { const k = (r.data.mission || '').trim().toUpperCase() || '—'; const t = by[k] || (by[k] = { tries:0, ok:0, n:0, last:null }); t.tries += num(r.data.tries); t.ok += num(r.data.successes); t.n++; if (!t.last || String(r.data.date || '') > String(t.last.date || '')) t.last = r.data; });
+  return by;
+}
+function testSummary() {
+  const by = testStats(); const keys = Object.keys(by).sort();
+  if (!keys.length) return null;
+  return h('div', { class:'tablewrap' }, h('table', { class:'tbl' },
+    h('thead', null, h('tr', null, ['Mission', 'Tests', 'Tries', 'Worked', 'Success', 'Latest'].map(x => h('th', null, x)))),
+    h('tbody', null, keys.map(k => { const t = by[k]; const pct = t.tries ? Math.round(100 * t.ok / t.tries) : 0; const lt = t.last && num(t.last.tries) ? `${num(t.last.successes)}/${num(t.last.tries)}` : '–';
+      return h('tr', null, h('td', null, k), h('td', null, String(t.n)), h('td', null, String(t.tries)), h('td', null, String(t.ok)), h('td', null, t.tries ? pct + '%' : '–'), h('td', null, lt)); }))));
+}
+
+/* ---------- Team ---------- */
+const CONTRIB = [
+  { k:'research', label:'Research', short:'Research' }, { k:'design', label:'Project ideas & models', short:'Ideas & models' }, { k:'sharing', label:'Sharing & feedback', short:'Sharing' },
+  { k:'building', label:'Building', short:'Building' }, { k:'coding', label:'Coding', short:'Coding' }, { k:'testing', label:'Testing', short:'Testing' },
+  { k:'strategy', label:'Strategy', short:'Strategy' }, { k:'presenting', label:'Presenting', short:'Talks' }, { k:'journal', label:'Session pages', short:'Journal' },
+];
+function contributions() {
+  const out = {}; roster().forEach(k => { out[k.id] = Object.fromEntries(CONTRIB.map(c => [c.k, 0])); });
+  const addBy = (ids, key) => (Array.isArray(ids) ? ids : ids ? [ids] : []).forEach(id => { if (out[id]) out[id][key]++; });
+  recs('research').forEach(r => addBy(r.data.by, 'research'));
+  recs('ideas').forEach(r => addBy(r.data.by, 'design'));
+  recs('prototypes').forEach(r => addBy(r.data.by, 'design'));
+  recs('plan').forEach(r => addBy(r.data.who, 'design'));
+  recs('feedback').forEach(r => addBy(r.data.by, 'sharing'));
+  recs('attachments').forEach(r => { addBy(r.data.by, 'building'); addBy((r.data.ideaBy || []).filter(x => !(r.data.by || []).includes(x)), 'building'); });
+  recs('programs').forEach(r => { addBy(r.data.by, 'coding'); addBy((r.data.ideaBy || []).filter(x => !(r.data.by || []).includes(x)), 'coding'); });
+  addBy(getPath(view('ws/rd') || {}, 'robot.by'), 'building');
+  recs('tests').forEach(r => addBy(r.data.by, 'testing'));
+  recs('matches').forEach(r => addBy(r.data.by, 'testing'));
+  recs('resources').forEach(r => addBy(r.data.by, 'strategy'));
+  MISSIONS.forEach(m => { const d = view('missions/' + m.k); if (d) addBy(d.owner, 'strategy'); });
+  recs('talk').forEach(r => addBy(r.data.who, 'presenting'));
+  recs('qa').forEach(r => addBy(r.data.who, 'presenting'));
+  sessions().forEach(s => roster().forEach(k => {
+    const kk = s.kids && s.kids[k.id]; if (!kk || isAbsent(s, k.id)) return;
+    if (has(kk.did) || has(kk.learned)) out[k.id].journal++;
+    const role = kk.role;
+    if (role === 'builder') out[k.id].building++;
+    if (role === 'coder') out[k.id].coding++;
+    if (role === 'strategist') out[k.id].strategy++;
+    if (role === 'researcher') out[k.id].research++;
+    if (role === 'designer') out[k.id].design++;
+    if (role === 'communicator') out[k.id].presenting++;
+  }));
+  return out;
+}
+function renderTeam(main) {
+  main.append(pageHead('Team', 'Who did what, our goals, and our Core Values stories. Judges check that every team member took part in building, coding and the project.'));
+  main.append(subnav([['who','Who did what'],['progress','Team Progress'],['stories','Core Values stories'],['roles','Team roles']]));
+  main.append(h('section', { class:'ws', id:'sec-who' },
+    h('div', { class:'ws-head' }, h('h3', null, 'Who did what'), h('p', { class:'rubric-hint' }, 'Counted from everyone’s entries and the jobs they picked in each session. A zero shows where someone needs a turn.')),
+    region('contrib', contribTable, () => JSON.stringify(contributions())),
+    S.role === 'coach' ? h('div', null, h('button', { class:'btn', onclick: openTeamSettings }, 'Team settings')) : null));
+  main.append(h('section', { class:'ws', id:'sec-progress' },
+    h('div', { class:'ws-head' }, h('h3', null, 'Team Progress'), h('p', { class:'rubric-hint' }, 'Each team member fills this in three times: at the start, halfway, and just before the event.')),
+    h('div', { class:'recs' }, activeKids().map(k => {
+      const path = 'progress/' + k.id;
+      const prevRO = RO; RO = !canEditKid(k.id);
+      try {
+      return h('article', { class:'rec', style:`--kid:${kidColor(k)}` }, h('div', { class:'rec-head' }, h('div', { class:'wholine' }, avatar(k), h('b', null, k.name))),
+        h('div', { class:'fgrid' },
+          h('p', { class:'stage mono wide' }, 'Start here'),
+          fieldInput(path, { k:'start.cv', label:'We will use Core Values to…', type:'textarea' }),
+          fieldInput(path, { k:'start.robot', label:'We want our robot to…', type:'textarea' }),
+          fieldInput(path, { k:'start.project', label:'We want our innovation project to…', type:'textarea' }),
+          h('p', { class:'stage mono wide' }, 'Halfway there'),
+          fieldInput(path, { k:'half.learned', label:'So far, I have learned…', type:'textarea' }),
+          fieldInput(path, { k:'half.more', label:'I want to learn more about…', type:'textarea' }),
+          h('p', { class:'stage mono wide' }, 'Event time'),
+          fieldInput(path, { k:'event.proud', label:'I am proud of my team because we…', type:'textarea' })));
+      } finally { RO = prevRO; }
+    }))));
+  main.append(sheetSection('stories'));
+  main.append(h('section', { class:'ws', id:'sec-roles' },
+    h('div', { class:'ws-head' }, h('h3', null, 'Team roles'), h('p', { class:'rubric-hint' }, 'Pick a job on your session page. Try every role during the season.')),
+    h('div', { class:'rolegrid' }, ROLES.map(r => h('div', { class:'rolecard' }, h('b', null, r.label), h('span', null, r.d))))));
+}
+function contribTable() {
+  const c = contributions(); const kids = roster().filter(k => k.active !== false || Object.values(c[k.id] || {}).some(Boolean));
+  return h('div', { class:'tablewrap' }, h('table', { class:'tbl contrib' },
+    h('thead', null, h('tr', null, h('th', null, 'Team member'), CONTRIB.map(x => h('th', null, x.label)))),
+    h('tbody', null, kids.map(k => h('tr', null, h('td', null, h('span', { class:'wholine' }, avatar(k, 'sm'), k.name)),
+      CONTRIB.map(x => { const v = c[k.id][x.k]; return h('td', { class: v ? '' : 'zero' }, String(v)); }))))));
+}
+
+/* ---------- Judging ---------- */
+function statusOf(ok, started) { return ok ? 'good' : started ? 'start' : 'miss'; }
+function evidence() {
+  const ip = view('ws/ip') || {}; const rd = view('ws/rd') || {};
+  const R = k => recs(k).map(r => r.data);
+  const kids = activeKids(); const c = contributions();
+  const research = R('research'), ideas = R('ideas'), plan = R('plan'), protos = R('prototypes'), fb = R('feedback');
+  const res = R('resources'), att = R('attachments'), prog = R('programs'), tests = R('tests'), talk = R('talk');
+  const decided = MISSIONS.filter(m => has((view('missions/' + m.k) || {}).attempt)).length;
+  const types = new Set(research.map(r => r.type).filter(Boolean));
+  const groups = new Set(fb.map(r => r.group).filter(Boolean));
+  const ipKids = kids.filter(k => c[k.id] && (c[k.id].research + c[k.id].design + c[k.id].sharing) > 0).length;
+  const rdIdeas = kids.filter(k => c[k.id] && (c[k.id].building + c[k.id].coding + c[k.id].strategy + c[k.id].testing) > 0).length;
+  const bothSkills = kids.filter(k => c[k.id] && c[k.id].building > 0 && c[k.id].coding > 0).length;
+  const withPhotos = protos.filter(p => mediaOf(p).length).length;
+  const planGood = plan.filter(p => (p.who || []).length && p.due).length;
+  const fbChanged = fb.filter(f => has(f.changed)).length;
+  const tries = tests.reduce((a, t) => a + num(t.tries), 0);
+  const testChanged = tests.filter(t => has(t.change)).length;
+  const sensors = new Set(prog.flatMap(p => p.sensors || []).filter(s => s !== 'None'));
+  const robotLearned = sessions().reduce((a, s) => a + roster().filter(k => { const kk = s.kids && s.kids[k.id]; return kk && (kk.areas || []).includes('robot') && has(kk.learned); }).length, 0);
+  const rdLessons = has(getPath(rd, 'summary.lessons')) && has(getPath(rd, 'summary.process'));
+  const ipTalk = talk.filter(t => /Innovation/.test(t.part || '')); const rdTalk = talk.filter(t => /Robot/.test(t.part || ''));
+  const speakers = arr => new Set(arr.flatMap(t => t.who || [])).size;
+  const proud = kids.filter(k => has(getPath(view('progress/' + k.id) || {}, 'event.proud'))).length;
+  const n = kids.length || 1;
+  const row = (id, area, stepN, cv, label, st, detail, goV, goS) => ({ id, area, step: stepN, cv, label, status: st, detail, go: [goV, goS] });
+  return [
+    row('ip1','ip','Identify',false,'Problem clearly defined', statusOf(words(getPath(ip,'problem.statement')) >= 15, has(getPath(ip,'problem.statement'))), has(getPath(ip,'problem.statement')) ? `${words(getPath(ip,'problem.statement'))} words in the problem statement` : 'No problem statement yet', 'project','problem'),
+    row('ip2','ip','Identify',true,'Research from a variety of sources', statusOf(research.length >= 5 && types.size >= 3, research.length > 0), `${pl(research.length,'source')}, ${pl(types.size,'kind')}` + (types.size ? ` (${[...types].join(', ')})` : ''), 'project','research'),
+    row('ip3','ip','Design',false,'An effective project plan', statusOf(plan.length >= 4 && planGood >= Math.ceil(plan.length * 0.75), plan.length > 0), `${pl(plan.length,'step')}, ${planGood} with who and when, ${plan.filter(p => p.status === 'Done').length} done`, 'project','plan'),
+    row('ip4','ip','Design',true,'Every team member involved in the project', statusOf(ipKids === kids.length && kids.length > 0, ipKids > 0), `${ipKids} of ${kids.length} team members have project entries`, 'team','who'),
+    row('ip5','ip','Create',true,'Innovation in the solution explained', statusOf(words(getPath(ip,'solution.innovative')) >= 15, has(getPath(ip,'solution.innovative'))), has(getPath(ip,'solution.innovative')) ? 'What is new about it: written' : 'Not written yet', 'project','solution'),
+    row('ip6','ip','Create',false,'Model or drawing of the solution', statusOf(withPhotos >= 2, protos.length > 0), `${pl(protos.length,'prototype version')}, ${withPhotos} with photos`, 'project','prototypes'),
+    row('ip7','ip','Iterate',false,'Shared with several people or groups', statusOf(fb.length >= 3 && groups.size >= 2, fb.length > 0), `shared ${pl(fb.length,'time')}, ${pl(groups.size,'kind')} of people or groups`, 'project','feedback'),
+    row('ip8','ip','Iterate',true,'Improvements based on feedback', statusOf(fbChanged >= 2, fbChanged > 0), `${pl(fbChanged,'change')} made because of feedback`, 'project','feedback'),
+    row('ip9','ip','Communicate',false,'Solution and its impact explained', statusOf(words(getPath(ip,'solution.impact')) >= 15 && has(getPath(ip,'summary.text')), has(getPath(ip,'solution.impact'))), (has(getPath(ip,'solution.impact')) ? 'Impact written' : 'Impact not written') + (has(getPath(ip,'summary.text')) ? ', summary written' : ', no summary yet'), 'project','summary'),
+    row('ip10','ip','Communicate',true,'Pride and enthusiasm in the presentation', statusOf(ipTalk.length && speakers(ipTalk) >= n, ipTalk.length > 0), `${pl(ipTalk.length,'presentation part')}, ${speakers(ipTalk)} of ${kids.length} speaking`, 'judging','talk'),
+    row('rd1','rd','Identify',false,'Clear mission strategy', statusOf(decided >= 8 && has(getPath(rd,'criteria.easy')), decided > 0), `${decided} of ${MISSIONS.length} missions decided` + (has(getPath(rd,'criteria.easy')) ? ', rules written' : ', rules not written'), 'robot','strategy'),
+    row('rd2','rd','Identify',true,'Building and coding resources used', statusOf(res.length >= 4, res.length > 0), `${pl(res.length,'resource')} logged`, 'robot','resources'),
+    row('rd3','rd','Design',true,'Every team member contributed ideas', statusOf(rdIdeas === kids.length && kids.length > 0, rdIdeas > 0), `${rdIdeas} of ${kids.length} team members have robot entries`, 'team','who'),
+    row('rd4','rd','Design',false,'Building and coding skills in every team member', statusOf(bothSkills === kids.length && kids.length > 0, bothSkills > 0), `${bothSkills} of ${kids.length} have done both building and coding`, 'team','who'),
+    row('rd5','rd','Create',false,'Attachments and their purpose explained', statusOf(att.filter(a => has(a.purpose)).length >= 3 && has(getPath(rd, 'robot.why')), att.length > 0 || has(getPath(rd, 'robot.base'))), `${pl(att.length,'attachment')}, ${att.filter(a => has(a.purpose)).length} with a purpose written; robot: ${has(getPath(rd, 'robot.why')) ? 'explained' : 'not explained yet'}`, 'robot','attachments'),
+    row('rd6','rd','Create',false,'Code and sensor use explained', statusOf(prog.length >= 3 && sensors.size >= 1, prog.length > 0), `${pl(prog.length,'program')}; sensors: ${sensors.size ? [...sensors].join(', ') : 'none yet'}`, 'robot','programs'),
+    row('rd7','rd','Iterate',false,'Repeated testing of robot and code', statusOf(tests.length >= 10, tests.length > 0), `${pl(tests.length,'test')}, ${pl(tries,'try','tries')} in total`, 'robot','tests'),
+    row('rd8','rd','Iterate',true,'Improvements based on testing', statusOf(testChanged >= 3, testChanged > 0), `${pl(testChanged,'change')} made after testing`, 'robot','tests'),
+    row('rd9','rd','Communicate',true,'Process and lessons learned explained', statusOf(rdLessons && rdTalk.length > 0, rdLessons || robotLearned > 0 || rdTalk.length > 0), `Process and lessons page: ${rdLessons ? 'written' : 'not written yet'}; ${pl(robotLearned,'robot lesson')} in session pages; ${pl(rdTalk.length,'explanation part')}`, 'robot','process'),
+    row('rd10','rd','Communicate',true,'Pride and enthusiasm for the robot work', statusOf(rdTalk.length && speakers(rdTalk) >= n, rdTalk.length > 0 || proud > 0), `${speakers(rdTalk)} of ${kids.length} speaking in the explanation; ${proud} “proud of my team” answers`, 'judging','talk'),
+  ];
+}
+function renderJudging(main) {
+  main.append(pageHead('Judging', 'The judging session is 30 minutes: Innovation Project 5 min + 5 min questions, Robot Design 5 min + 5 min questions. There is no technology in the room, so bring the printed notebook.'));
+  main.append(subnav([['check','Evidence checklist'],['talk','Presentation plan'],['qa','Practice questions'],['day','Judging day'],['export','Print the notebook']]));
+  main.append(h('section', { class:'ws', id:'sec-check' },
+    h('div', { class:'ws-head' }, h('h3', null, 'Evidence checklist'),
+      h('p', { class:'rubric-hint' }, 'One line for every row of the two judging rubrics. Rows marked ⚙ also count toward Core Values. The colors are our own rule of thumb from what we have logged; they are not official scores.')),
+    region('evlist', () => {
+      const rows = evidence(); const out = [];
+      [['ip','Innovation Project'],['rd','Robot Design']].forEach(([a, label]) => {
+        out.push(h('h4', { class:'evarea' }, label));
+        rows.filter(r => r.area === a).forEach(r => out.push(h('div', { class:'evrow' },
+          h('span', { class:'evdot ' + r.status, 'aria-hidden':'true' }),
+          h('div', null, h('div', { class:'evlabel' }, h('span', { class:'mono evstep' }, r.step), r.label, r.cv ? h('span', { class:'gear', title:'Also counts toward Core Values' }, ' ⚙') : null), h('div', { class:'evdetail' }, r.detail)),
+          h('button', { class:'linkbtn', onclick: () => go(r.go[0], r.go[1]) }, { good:'Strong', start:'Started', miss:'Missing' }[r.status] + ' →'))));
+      });
+      return out;
+    }, () => JSON.stringify(evidence().map(r => [r.status, r.detail])))));
+  main.append(sheetSection('talk', region('talksum', () => {
+    const t = recs('talk').map(r => r.data); if (!t.length) return null;
+    const sum = p => t.filter(x => x.part === p).reduce((a, x) => a + num(x.seconds), 0);
+    const line = (p, max) => { const s = sum(p); return h('span', { class: s > max ? 'over' : '' }, `${p.split(' ')[0] === 'Innovation' ? 'Project' : p.split(' ')[0] === 'Robot' ? 'Robot' : 'Final'}: ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}${max ? ' of ' + max / 60 + ':00' : ''}`); };
+    return h('p', { class:'hint timing' }, line('Innovation Project presentation', 300), ' · ', line('Robot Design explanation', 300));
+  }, () => JSON.stringify(recs('talk').map(r => [r.data.part, r.data.seconds])))));
+  main.append(sheetSection('qa'));
+  main.append(h('section', { class:'ws', id:'sec-day' },
+    h('div', { class:'ws-head' }, h('h3', null, 'Judging day')),
+    h('ul', { class:'daylist' },
+      h('li', null, 'The presentation must be live. A recorded video alone is not allowed.'),
+      h('li', null, 'Do not count on any technology in the room: bring the printed notebook, posters and models.'),
+      h('li', null, 'Bring the robot, every attachment, and printed examples of the code.'),
+      h('li', null, 'Bring the prototype or drawings of the project solution.'),
+      h('li', null, 'Every team member at the event takes part in the judging session.'),
+      h('li', null, 'At the robot game, referees score Gracious Professionalism at every match: be kind to the other team, thank the referee, cheer for others.'),
+      h('li', null, 'All the work shown is the team members’ own work. Coaches do not answer for the team.'))));
+  main.append(h('section', { class:'ws', id:'sec-export' },
+    h('div', { class:'ws-head' }, h('h3', null, 'Print the notebook'), h('p', { class:'rubric-hint' }, 'Makes a PDF with the team page, the project and robot worksheets, every session, the Core Values summary and an evidence index. Open it and print.')),
+    h('div', null, h('button', { class:'btn primary', onclick: openExport }, 'Export PDF'))));
+}
+
+/* ================= PDF export ================= */
+function openExport() {
+  flush();
+  const l = sessions();
+  const opt = (s, i) => h('option', { value:String(i) }, `Session ${s.num} · ${fmtDate(s.date)}`);
+  const from = h('select', { id:'ex-from' }, l.map(opt)); from.value = '0';
+  const to = h('select', { id:'ex-to' }, l.map(opt)); to.value = String(Math.max(0, l.length - 1));
+  const ids = l.map(s => s.id);
+  const cb = (id, label, on) => { const i = h('input', { type:'checkbox', id, checked:on }); return [i, h('label', { class:'chk', for:id }, i, label)]; };
+  const parts = [
+    cb('ex-front', 'Cover page and contents', true), cb('ex-team', 'Team: who did what, roles, Team Progress', true),
+    cb('ex-ip', 'Innovation Project worksheets', true), cb('ex-rd', 'Robot Design worksheets', true),
+    cb('ex-ses', 'Session pages', true), cb('ex-sum', 'Core Values summary and evidence index', true), cb('ex-ph', 'Photos and sketches', true),
+  ];
+  const st = h('p', { class:'status', role:'status' });
+  const out = h('div', { class:'dfoot', style:'justify-content:flex-start' });
+  const goB = h('button', { class:'btn primary', onclick: () => {
+    let a = num(from.value), b = num(to.value); if (a > b) [a, b] = [b, a];
+    const o = { front: parts[0][0].checked, team: parts[1][0].checked, ip: parts[2][0].checked, rd: parts[3][0].checked, sessions: parts[4][0].checked, summary: parts[5][0].checked, photos: parts[6][0].checked };
+    runExport(l.length ? ids.slice(a, b + 1) : [], o, st, goB, out);
+  } }, 'Make PDF');
+  dialog('Print the notebook', [
+    h('p', { class:'muted' }, 'Makes a print-ready PDF (US Letter). Each part starts on a new page. Photos take a moment to collect.'),
+    l.length ? h('div', { class:'grid2' }, field('ex-from', 'Sessions from', from), field('ex-to', 'to', to)) : h('p', { class:'hint' }, 'No sessions yet.'),
+    h('div', { style:'display:grid;gap:8px' }, parts.map(p => p[1])),
+    st, out, h('div', { class:'dfoot' }, goB)], true);
+}
+async function loadForPdf(id) {
+  const r = await api('photo', { id });
+  const bytes = Uint8Array.from(atob(r.data), c => c.charCodeAt(0));
+  const { canvas, w, h: hh } = await toJpeg(new Blob([bytes], { type:'image/jpeg' }), 1400, false);
+  return { data: canvas.toDataURL('image/jpeg', 0.8), w, h: hh };
+}
+async function runExport(idList, o, st, btn, out) {
+  st.className = 'status'; out.replaceChildren();
+  if (!window.jspdf || !window.jspdf.jsPDF) { st.textContent = 'The PDF maker did not load. Check the internet connection and reload the page.'; st.className = 'status err'; return; }
+  btn.disabled = true;
+  try {
+    await flushAll();
+    const sel = sessions().filter(s => idList.includes(s.id));
+    const images = new Map();
+    if (o.photos) {
+      const media = [];
+      if (o.sessions) sel.forEach(s => media.push(...mediaOf(s)));
+      if (o.ip) recs('prototypes').forEach(r => media.push(...mediaOf(r.data)));
+      if (o.rd) { media.push(...mediaOf(view('ws/rd'))); ['attachments', 'programs'].forEach(k => recs(k).forEach(r => media.push(...mediaOf(r.data)))); }
+      for (let i = 0; i < media.length; i++) {
+        st.textContent = `Getting photos… ${i + 1} of ${media.length}`;
+        if (images.has(media[i].id)) continue;
+        try { images.set(media[i].id, await loadForPdf(media[i].id)); } catch (_) { images.set(media[i].id, null); }
+      }
+    }
+    st.textContent = 'Building pages…'; await frame();
+    const res = buildPdf(sel, o, images);
+    const t = team() || {};
+    const fname = [slug(t.name, 'team'), slug(t.number, ''), 'engineering-notebook', todayStr()].filter(Boolean).join('-') + '.pdf';
+    const url = URL.createObjectURL(res.blob);
+    const a = h('a', { href:url, download:fname }); document.body.append(a); a.click(); setTimeout(() => a.remove(), 1000);
+    st.className = 'status ok'; st.textContent = `Done: ${res.pages} pages. Check your Downloads folder, then print.`;
+    out.replaceChildren(h('a', { class:'btn', href:url, download:fname, target:'_blank', rel:'noopener' }, 'Download again'));
+  } catch (e) {
+    st.className = 'status err';
+    st.textContent = 'Could not make the PDF: ' + ((e && (e.message || e.code)) || e);
+  } finally { btn.disabled = false; }
+}
+// Helvetica in the PDF only has Western European characters: normalize quotes/dashes, drop the rest (emoji etc.).
+function T(s) {
+  return String(s == null ? '' : s)
+    .replace(/[‘’‚ʼ′]/g, "'").replace(/[“”„″]/g, '"')
+    .replace(/[–—−]/g, '-').replace(/…/g, '...').replace(/[   ]/g, ' ')
+    .replace(/•/g, '-').replace(/→/g, '->').replace(/[✓★⚙]/g, '').replace(/\r\n?/g, '\n')
+    .replace(/[^\n\x20-\x7E¡-ÿ]/g, '');
+}
+function buildPdf(list, opt, images) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'letter', compress:true });
+  const W = 612, H = 792, L = 68, R = 54, TOP = 58, BOT = 66, CW = W - L - R;
+  const C = { ink:[20,36,29], ink2:[74,93,84], ink3:[118,134,127], line:[206,217,210], soft:[234,241,236], accent:[10,123,111], night:[15,32,25], glow:[111,240,207], white:[255,255,255],
+    ok:[21,128,61], mid:[180,83,9], bad:[180,35,24] };
+  const VCOL = { Discovery:[47,107,208], Innovation:[122,75,203], Impact:[22,134,90], Inclusion:[196,71,63], Teamwork:[184,110,12], Fun:[194,63,121] };
+  const tm = team() || {}; const all = roster();
+  const tname = T(tm.name || 'Our team'); const tnum = T(tm.number || ''); const season = T(tm.season || 'BIOGLOW 2026-27');
+  let y = TOP; let blank = true;
+  const pageOf = new Map();
+  const page = () => doc.getNumberOfPages();
+  const font = (st, sz) => { doc.setFont('helvetica', st); doc.setFontSize(sz); };
+  const col = c => doc.setTextColor(c[0], c[1], c[2]);
+  const fill = c => doc.setFillColor(c[0], c[1], c[2]);
+  const stroke = c => doc.setDrawColor(c[0], c[1], c[2]);
+  const txt = (s, x, yy, o) => { if (s === '' || s == null) return; doc.text(s, x, yy, Object.assign({ baseline:'top' }, o || {})); };
+  const split = (s, w) => doc.splitTextToSize(T(s), w);
+  const newPage = () => { if (blank) blank = false; else doc.addPage(); y = TOP; };
+  const ensure = need => { if (y + need > H - BOT) { newPage(); return true; } return false; };
+  const hr = (c, w) => { stroke(c || C.line); doc.setLineWidth(w || 0.6); doc.line(L, y, L + CW, y); };
+  const names = ids => namesOf(ids).join(', ');
+  function para(s, o = {}) {
+    const size = o.size || 10.5, lh = size * (o.lh || 1.42), x = o.x || L, w = o.w || CW, style = o.style || 'normal', color = o.color || C.ink;
+    font(style, size);
+    for (const ln of split(s, w)) { ensure(lh); font(style, size); col(color); txt(ln, x, y); y += lh; }
+    y += (o.after == null ? 6 : o.after);
+  }
+  function part(title, eyebrow, key) {
+    newPage(); pageOf.set(key, page());
+    fill(C.accent); doc.rect(L, y, 30, 3, 'F'); y += 11;
+    font('bold', 9); col(C.accent); txt(T(eyebrow).toUpperCase(), L, y, { charSpace: 0.6 }); y += 16;
+    font('bold', 24); col(C.ink); txt(T(title), L, y); y += 36;
+  }
+  function sub(title, key, hint) {
+    ensure(26 + 50); y += 6;
+    if (key) pageOf.set(key, page());
+    font('bold', 14); col(C.ink); txt(T(title), L, y); y += 20;
+    if (hint) para(hint, { size:9, color:C.ink3, after:6 });
+  }
+  function kv(label, value) {
+    if (!has(value)) return;
+    ensure(14 + 28);
+    font('bold', 8); col(C.ink3); txt(T(label).toUpperCase(), L, y, { charSpace: 0.4 }); y += 12;
+    para(value, { after:10 });
+  }
+  function table(cols, rows, o = {}) {
+    const size = o.size || 9; const lh = size * 1.35;
+    const Wd = cols.map(c => c.w * CW);
+    font('bold', 7.2);
+    const headL = cols.map((c, i) => split(T(c.label).toUpperCase(), Wd[i] - 6));
+    const hh = Math.max(...headL.map(l => l.length)) * 9 + 4;
+    const head = () => { let x = L; headL.forEach((ls, i) => { ls.forEach((ln, j) => { font('bold', 7.2); col(C.ink3); txt(ln, x + 3, y + j * 9); }); x += Wd[i]; }); y += hh; hr(); };
+    ensure(hh + 30); head();
+    const room = H - BOT - TOP - hh - 20;
+    rows.forEach(r => {
+      const wr = r.map((cell, i) => { const s = cell && typeof cell === 'object' ? cell.text : cell; font(cols[i].bold ? 'bold' : 'normal', size); return split(s == null ? '' : String(s), Wd[i] - 6); });
+      const colors = r.map(cell => (cell && typeof cell === 'object' && cell.color) || C.ink);
+      const n = Math.max(1, ...wr.map(w => w.length)); const rh = n * lh + 8;
+      if (rh <= room) {                                   // normal row: keep it on one page
+        if (ensure(rh)) head();
+        let x = L;
+        wr.forEach((ls, i) => { ls.forEach((ln, j) => { font(cols[i].bold ? 'bold' : 'normal', size); col(colors[i]); txt(ln, x + 3, y + 4 + j * lh); }); x += Wd[i]; });
+        y += rh; hr();
+      } else {                                            // very long row: continue it on the next page
+        if (ensure(lh * 3 + 8)) head();
+        y += 4;
+        for (let j = 0; j < n; j++) {
+          if (y + lh > H - BOT) { newPage(); head(); y += 4; }
+          let x = L;
+          wr.forEach((ls, i) => { if (ls[j] != null) { font(cols[i].bold ? 'bold' : 'normal', size); col(colors[i]); txt(ls[j], x + 3, y); } x += Wd[i]; });
+          y += lh;
+        }
+        y += 4; hr();
+      }
+    });
+    y += 10;
+  }
+  function photoGrid(media, labelFn) {
+    const gap = 16, cw = (CW - gap) / 2, maxH = 200;
+    const rowsP = [];
+    for (let i = 0; i < media.length; i += 2) {
+      const row = media.slice(i, i + 2).map(m => {
+        const im = images.get(m.id); let w = cw, hh = 44;
+        if (im) { const r = Math.min(cw / im.w, maxH / im.h); w = im.w * r; hh = im.h * r; }
+        font('normal', 8.5); const cap = split(labelFn(m), cw).slice(0, 6);
+        return { m, im, w, hh, cap };
+      });
+      rowsP.push({ row, rowH: Math.max(...row.map(r => r.hh + 5 + r.cap.length * 11)) + 14 });
+    }
+    return rowsP;
+  }
+  function drawPhotos(rowsP) {
+    for (const { row, rowH } of rowsP) {
+      ensure(rowH);
+      row.forEach((r, j) => {
+        const x = L + j * ((CW - 16) / 2 + 16);
+        if (r.im) { doc.addImage(r.im.data, 'JPEG', x, y, r.w, r.hh, 'm' + r.m.id, 'FAST'); stroke(C.line); doc.setLineWidth(0.5); doc.rect(x, y, r.w, r.hh); }
+        else { fill(C.soft); doc.rect(x, y, (CW - 16) / 2, r.hh, 'F'); font('italic', 9); col(C.ink3); txt('[image not available]', x + 8, y + 16); }
+        r.cap.forEach((ln, k) => { font('normal', 8.5); col(C.ink2); txt(ln, x, y + r.hh + 5 + k * 11); });
+      });
+      y += rowH;
+    }
+  }
+  function photos(media, labelFn) {
+    if (!opt.photos || !media.length) return;
+    const rowsP = photoGrid(media, labelFn);
+    drawPhotos(rowsP);
+  }
+  const whoLabel = m => m.by === 'team' ? 'Team' : kidName(m.by);
+  const capLabel = m => (m.kind === 'sketch' ? 'Sketch' : 'Photo') + (whoLabel(m) ? ' by ' + whoLabel(m) : '') + (has(m.caption) ? ': ' + m.caption : '');
+  function pillsAt(items, x, yy) {
+    font('bold', 8);
+    for (const it of items) {
+      const s = T(it); const w = doc.getTextWidth(s) + 12;
+      if (x + w > L + CW) break;
+      fill(VCOL[it] || C.accent); doc.roundedRect(x, yy, w, 13, 6.5, 6.5, 'F');
+      col(C.white); txt(s, x + 6, yy + 2.8); x += w + 4;
+    }
+    return x;
+  }
+  let secN = 0;
+  function sec(title) {
+    ensure(30 + 44); y += 8; secN++;
+    fill(C.accent); doc.circle(L + 9, y + 8, 9, 'F');
+    font('bold', 10); col(C.white); txt(String(secN), L + 9, y + 3, { align:'center' });
+    font('bold', 13.5); col(C.ink); txt(T(title), L + 26, y + 1.5);
+    y += 26;
+  }
+  function nameLine(name, tags, values) {
+    ensure(18 + 28);
+    font('bold', 11); col(C.ink); txt(T(name), L, y);
+    let x = L + doc.getTextWidth(T(name)) + 8;
+    if (values && values.length) x = pillsAt(values, x, y - 0.5) + 2;
+    if (tags && tags.length) { font('normal', 8); col(C.ink3); txt(T(tags.join(' / ').toUpperCase()), x, y + 2.2); }
+    y += 17;
+  }
+
+  // ---------- Cover ----------
+  if (opt.front) {
+    blank = false;
+    fill(C.night); doc.rect(0, 0, W, 318, 'F');
+    fill(C.glow);
+    [[70,60,2.2],[132,250,1.6],[210,118,3],[300,40,1.4],[372,280,2.4],[448,96,1.8],[520,210,3.2],[566,52,1.5],[480,290,1.4],[250,300,1.8]].forEach(([cx, cy, r]) => doc.circle(cx, cy, r, 'F'));
+    font('bold', 10); col(C.glow); txt('FIRST LEGO LEAGUE CHALLENGE  ·  ' + season.toUpperCase(), L, 96, { charSpace: 1 });
+    let ns = 46; font('bold', ns);
+    while (doc.getTextWidth(tname) > CW && ns > 24) { ns -= 2; font('bold', ns); }
+    col(C.white); split(tname, CW).slice(0, 2).forEach((ln, i) => txt(ln, L, 122 + i * ns * 1.05));
+    if (tnum) { font('normal', 16); col([200,228,218]); txt('Team #' + tnum, L, 180); }
+    font('bold', 26); col(C.white); txt('Engineering Notebook', L, 232);
+    y = 360;
+    const label = s => { font('bold', 9); col(C.accent); txt(s, L, y, { charSpace: 0.8 }); y += 16; };
+    label('TEAM MEMBERS');
+    para(activeKids().map(k => k.name).join(',  ') || '-', { size:16, style:'bold', after:14 });
+    if (has(tm.coaches)) { label('COACHES'); para(tm.coaches, { size:12.5, after:14 }); }
+    if (list.length) {
+      label('IN THIS NOTEBOOK');
+      const first = list[0], last = list[list.length - 1];
+      para(`Session ${first.num} to Session ${last.num}  ·  ${fmtDate(first.date, true)} to ${fmtDate(last.date, true)}`, { size:11.5, after:14 });
+    }
+    if (has(tm.coverNote)) { hr(); y += 12; para(tm.coverNote, { size:11, style:'italic', color:C.ink2 }); }
+    newPage();
+  }
+  const contentsPage = opt.front ? page() : 0;
+
+  // ---------- Team ----------
+  if (opt.team) {
+    part('Our team', 'Part 1 · Team', 'team');
+    sub('Who did what', 'team:who', 'Counted from each team member’s own entries in this notebook and the jobs they chose in each session.');
+    const c = contributions(); const kidsIn = all.filter(k => k.active !== false || Object.values(c[k.id] || {}).some(Boolean));
+    const w0 = 0.13, wr = (1 - w0) / CONTRIB.length;
+    table([{ label:'Name', w:w0, bold:true }].concat(CONTRIB.map(x => ({ label:x.short, w:wr }))), kidsIn.map(k => [k.name].concat(CONTRIB.map(x => String(c[k.id][x.k])))), { size:8.5 });
+    para('Journal = session pages with an entry. Talks = parts in the presentation plan and practice answers.', { size:8, color:C.ink3, after:8 });
+    const roleCount = {}; kidsIn.forEach(k => { roleCount[k.id] = {}; });
+    sessions().forEach(s => kidsIn.forEach(k => { const r = s.kids && s.kids[k.id] && s.kids[k.id].role; if (r && RMAP[r]) roleCount[k.id][r] = (roleCount[k.id][r] || 0) + 1; }));
+    if (kidsIn.some(k => Object.keys(roleCount[k.id]).length)) {
+      sub('Jobs in our sessions', 'team:roles');
+      table([{ label:'Team member', w:0.2, bold:true }, { label:'Jobs taken (number of sessions)', w:0.8 }], kidsIn.map(k => [k.name, Object.keys(roleCount[k.id]).map(r => `${RMAP[r].label} (${roleCount[k.id][r]})`).join(', ') || '-']));
+    }
+    const prog = activeKids().map(k => ({ k, d: view('progress/' + k.id) || {} })).filter(x => Object.keys(x.d).length);
+    if (prog.length) {
+      sub('Team Progress', 'team:progress', 'Our goals at the start, halfway, and at event time.');
+      prog.forEach(({ k, d }) => {
+        nameLine(k.name);
+        kv('We will use Core Values to', getPath(d, 'start.cv')); kv('We want our robot to', getPath(d, 'start.robot')); kv('We want our innovation project to', getPath(d, 'start.project'));
+        kv('So far, I have learned', getPath(d, 'half.learned')); kv('I want to learn more about', getPath(d, 'half.more')); kv('I am proud of my team because we', getPath(d, 'event.proud'));
+      });
+    }
+  }
+
+  // ---------- Innovation Project ----------
+  if (opt.ip) {
+    const ip = view('ws/ip') || {};
+    part('Innovation Project', 'Part 2 · Innovation Project', 'ip');
+    if (has(getPath(ip, 'problem.statement')) || has(getPath(ip, 'problem.why'))) {
+      sub('Our problem', 'ip:problem');
+      kv('Problem statement', getPath(ip, 'problem.statement')); kv('Why it matters for biodiversity', getPath(ip, 'problem.why')); kv('Who or what is affected', getPath(ip, 'problem.who'));
+    }
+    const rs = recs('research').map(r => r.data);
+    if (rs.length) { sub('Research log', 'ip:research', `${rs.length} sources, ${new Set(rs.map(r => r.type).filter(Boolean)).size} kinds of sources.`);
+      table([{ label:'Date', w:0.12 }, { label:'Kind', w:0.13 }, { label:'Source', w:0.22 }, { label:'What we learned', w:0.38 }, { label:'Found by', w:0.15 }], rs.slice().reverse().map(r => [r.date ? fmtDate(r.date) : '', r.type, [r.source, r.link].filter(Boolean).join('\n'), r.learned, names(r.by)])); }
+    const ids = recs('ideas').map(r => r.data);
+    if (ids.length) { sub('Ideas and our choice', 'ip:ideas');
+      table([{ label:'Idea', w:0.26, bold:true }, { label:'Status', w:0.12 }, { label:'Votes', w:0.08 }, { label:'Why', w:0.38 }, { label:'Idea from', w:0.16 }], ids.map(r => [r.idea, r.status, r.votes === '' || r.votes == null ? '' : String(r.votes), [r.details, r.why].filter(has).join('\n'), names(r.by)])); }
+    const pl = recs('plan').map(r => r.data);
+    if (pl.length) { sub('Project plan', 'ip:plan');
+      table([{ label:'Step', w:0.42 }, { label:'Who', w:0.22 }, { label:'Finish by', w:0.16 }, { label:'Status', w:0.2 }], pl.map(r => [[r.step, r.notes].filter(has).join('\n'), names(r.who), r.due ? fmtDate(r.due) : '', { text: r.status || '', color: r.status === 'Done' ? C.ok : C.ink }])); }
+    if (['name','what','innovative','impact','users'].some(k => has(getPath(ip, 'solution.' + k)))) {
+      sub('Our solution', 'ip:solution');
+      kv('Name', getPath(ip, 'solution.name')); kv('What it does', getPath(ip, 'solution.what')); kv('What is new about it', getPath(ip, 'solution.innovative'));
+      kv('How it helps biodiversity and people', getPath(ip, 'solution.impact')); kv('Who would use it', getPath(ip, 'solution.users'));
+    }
+    const pv = recs('prototypes').slice().reverse();
+    if (pv.length) { sub('Prototype versions', 'ip:prototypes');
+      pv.forEach(r => { const d = r.data; nameLine((d.version || 'Version') + (d.date ? ' - ' + fmtDate(d.date) : ''), namesOf(d.by));
+        kv('What we made', d.what); kv('What changed and why', d.changed); photos(mediaOf(d), capLabel); y += 4; }); }
+    const fb = recs('feedback').map(r => r.data);
+    if (fb.length) { sub('Sharing and feedback', 'ip:feedback', `Shared ${fb.length} times with ${new Set(fb.map(f => f.group).filter(Boolean)).size} kinds of people or groups.`);
+      table([{ label:'Date', w:0.11 }, { label:'Who', w:0.19 }, { label:'What they said', w:0.3 }, { label:'What we changed', w:0.27 }, { label:'Shared by', w:0.13 }], fb.slice().reverse().map(r => [r.date ? fmtDate(r.date) : '', [r.who, r.group, r.how].filter(has).join('\n'), r.said, r.changed, names(r.by)])); }
+    if (has(getPath(ip, 'summary.text'))) { sub('Project summary', 'ip:summary'); para(getPath(ip, 'summary.text')); }
+  }
+
+  // ---------- Robot Design ----------
+  if (opt.rd) {
+    const rd = view('ws/rd') || {};
+    part('Robot Design', 'Part 3 · Robot Design', 'rd');
+    if (has(getPath(rd, 'robot.base')) || has(getPath(rd, 'robot.why')) || mediaOf(rd).length) {
+      sub('Our robot', 'rd:robot');
+      if (namesOf(getPath(rd, 'robot.by')).length) para('Built by ' + names(getPath(rd, 'robot.by')), { size:9.5, color:C.ink2, after:8 });
+      kv('Drive base', getPath(rd, 'robot.base')); kv('Why we chose it', getPath(rd, 'robot.why')); kv('How it changed', getPath(rd, 'robot.changes'));
+      photos(mediaOf(rd), capLabel);
+    }
+    if (['easy','close','points','tie'].some(k => has(getPath(rd, 'criteria.' + k))) || has(getPath(rd, 'runs.plan'))) {
+      sub('How we decide', 'rd:criteria');
+      kv('Easy means', getPath(rd, 'criteria.easy')); kv('Close means', getPath(rd, 'criteria.close')); kv('Points', getPath(rd, 'criteria.points'));
+      kv('When the rules disagree', getPath(rd, 'criteria.tie')); kv('Our runs', getPath(rd, 'runs.plan'));
+    }
+    const ms = MISSIONS.map(m => ({ m, d: view('missions/' + m.k) || {} })).filter(x => Object.keys(x.d).some(k => has(x.d[k]) || (Array.isArray(x.d[k]) && x.d[k].length)));
+    if (ms.length) { sub('Mission strategy', 'rd:strategy');
+      table([{ label:'Mission', w:0.25, bold:true }, { label:'Try?', w:0.09 }, { label:'Pts', w:0.07 }, { label:'Difficulty', w:0.11 }, { label:'Distance', w:0.1 }, { label:'Run', w:0.07 }, { label:'Owner', w:0.13 }, { label:'Notes', w:0.18 }],
+        ms.map(({ m, d }) => [`${m.k} ${m.name}`, { text: d.attempt || '', color: d.attempt === 'Yes' ? C.ok : C.ink }, d.points === '' || d.points == null ? '' : String(d.points), d.difficulty, d.distance, d.run, names(d.owner), d.notes]), { size:8.5 }); }
+    const res = recs('resources').map(r => r.data);
+    if (res.length) { sub('Building and coding resources', 'rd:resources');
+      table([{ label:'Resource', w:0.3 }, { label:'Kind', w:0.15 }, { label:'What it helped us do', w:0.4 }, { label:'Used by', w:0.15 }], res.map(r => [[r.title, r.link].filter(Boolean).join('\n'), r.type, r.usedFor, names(r.by)])); }
+    const at = recs('attachments');
+    if (at.length) { sub('Attachments', 'rd:attachments');
+      at.forEach(r => { const d = r.data; nameLine(d.name || 'Attachment', [d.missions].concat(namesOf(d.by)).filter(Boolean));
+        if (namesOf(d.ideaBy).length) para('Idea from ' + names(d.ideaBy), { size:9, color:C.ink2, after:4 });
+        kv('What it does and why', d.purpose); kv('Versions and changes', d.changes); photos(mediaOf(d), capLabel); y += 4; }); }
+    const pg = recs('programs');
+    if (pg.length) { sub('Programs', 'rd:programs');
+      pg.forEach(r => { const d = r.data; nameLine(d.name || 'Program', [d.missions].concat(namesOf(d.by)).filter(Boolean));
+        if (namesOf(d.ideaBy).length) para('Idea from ' + names(d.ideaBy), { size:9, color:C.ink2, after:4 });
+        kv('Sensors', (d.sensors || []).join(', ')); kv('How it works', d.how); photos(mediaOf(d), capLabel); y += 4; }); }
+    const ts = recs('tests').map(r => r.data);
+    if (ts.length) {
+      sub('Test log', 'rd:tests', `${ts.length} tests, ${ts.reduce((a, t) => a + num(t.tries), 0)} tries in total.`);
+      const by = testStats(); const keys = Object.keys(by).sort();
+      table([{ label:'Mission', w:0.2, bold:true }, { label:'Tests', w:0.12 }, { label:'Tries', w:0.12 }, { label:'Worked', w:0.12 }, { label:'Success', w:0.14 }, { label:'Latest test', w:0.3 }],
+        keys.map(k => { const t = by[k]; return [k, String(t.n), String(t.tries), String(t.ok), t.tries ? Math.round(100 * t.ok / t.tries) + '%' : '-', t.last && num(t.last.tries) ? `${num(t.last.successes)}/${num(t.last.tries)}` + (t.last.date ? ' on ' + fmtDate(t.last.date) : '') : '-']; }));
+      table([{ label:'Date', w:0.1 }, { label:'Mission', w:0.1 }, { label:'Program / attachment', w:0.15 }, { label:'Worked', w:0.08 }, { label:'What went wrong', w:0.22 }, { label:'What we changed', w:0.22 }, { label:'By', w:0.13 }],
+        ts.slice().reverse().map(t => [t.date ? fmtDate(t.date) : '', t.mission, [t.program, t.attachment].filter(Boolean).join('\n'), num(t.tries) ? `${num(t.successes)}/${num(t.tries)}` : '', t.problem, t.change, names(t.by)]), { size:8.5 });
+    }
+    const mt = recs('matches').map(r => r.data);
+    if (mt.length) { sub('Practice matches', 'rd:matches', `Best score: ${Math.max(...mt.map(m => num(m.score)))} points.`);
+      table([{ label:'Date', w:0.11 }, { label:'Score', w:0.08, bold:true }, { label:'Tokens', w:0.08 }, { label:'Missions that scored', w:0.2 }, { label:'What we learned', w:0.2 }, { label:'Gracious Professionalism', w:0.2 }, { label:'Technicians', w:0.13 }],
+        mt.slice().reverse().map(m => [m.date ? fmtDate(m.date) : '', String(num(m.score)), m.tokens === '' || m.tokens == null ? '' : String(m.tokens), m.missions, m.notes, m.gp, names(m.by)]), { size:8.5 }); }
+    if (['process','lessons','proud'].some(k => has(getPath(rd, 'summary.' + k)))) {
+      sub('Our design process and lessons learned', 'rd:process');
+      kv('Our process', getPath(rd, 'summary.process')); kv('What we learned', getPath(rd, 'summary.lessons')); kv('What we are most proud of', getPath(rd, 'summary.proud'));
+    }
+  }
+
+  // ---------- Sessions ----------
+  if (opt.sessions && list.length) {
+    const full = sessions();
+    list.forEach((s, si) => {
+      const idx = full.findIndex(x => x.id === s.id); const prev = idx > 0 ? full[idx - 1] : null;
+      newPage(); pageOf.set('s:' + s.id, page()); if (si === 0) pageOf.set('sessions', page()); secN = 0;
+      const kids = sessionKids(s);
+      fill(C.accent); doc.rect(L, y, 30, 3, 'F'); y += 11;
+      font('bold', 9); col(C.accent);
+      txt(T(`SESSION ${s.num}` + (s.tmg ? `   ·   TEAM MEETING GUIDE SESSION ${s.tmg}` : '')), L, y, { charSpace: 0.6 });
+      font('normal', 9.5); col(C.ink2); txt(T(fmtDate(s.date, true)), L + CW, y, { align:'right' });
+      y += 17;
+      const p = s.tmg && PLAN[s.tmg];
+      const title = has(s.focus) ? s.focus : (p ? p.t.join(' · ') : `Session ${s.num}`);
+      font('bold', 20);
+      split(title, CW).forEach(ln => { ensure(25); font('bold', 20); col(C.ink); txt(ln, L, y); y += 25; });
+      y += 2;
+      if (p && has(s.focus)) para('Plan: ' + p.t.join(' · '), { size:9.5, color:C.ink2, after:2 });
+      const here = kids.filter(k => !isAbsent(s, k.id)).map(k => k.name + (s.kids && s.kids[k.id] && RMAP[s.kids[k.id].role] ? ` (${RMAP[s.kids[k.id].role].label})` : ''));
+      const away = kids.filter(k => isAbsent(s, k.id)).map(k => k.name);
+      para('Present: ' + (here.join(', ') || '-') + (away.length ? '      Absent: ' + away.join(', ') : ''), { size:9.5, color:C.ink2, after:10 });
+      hr(); y += 4;
+      sec('Homework check');
+      if (!prev) para('This is the first session in the notebook, so there was no homework to check.', { color:C.ink2, size:10 });
+      else {
+        const rows = kids.map(k => { const kk = (s.kids && s.kids[k.id]) || {}; const ab = isAbsent(s, k.id);
+          return [k.name, (prev.hwNext && prev.hwNext[k.id]) || '-', { text: ab ? 'Absent' : (HWL[kk.hw] || 'Not checked'), color: ab ? C.ink3 : ({ done:C.ok, partly:C.mid, not:C.bad }[kk.hw] || C.ink3) }, ab ? '' : (kk.hwNote || '')]; });
+        if (has(prev.hwNext && prev.hwNext.team)) rows.push(['Team', prev.hwNext.team, '', '']);
+        table([{ label:'Name', w:0.16, bold:true }, { label:`Homework from Session ${prev.num}`, w:0.38 }, { label:'Status', w:0.15, bold:true }, { label:'What they did', w:0.31 }], rows, { size:9.5 });
+      }
+      const didKids = kids.filter(k => !isAbsent(s, k.id) && has(s.kids && s.kids[k.id] && s.kids[k.id].did));
+      if (has(s.teamDid) || didKids.length) {
+        sec('What we did');
+        if (has(s.teamDid)) { nameLine('Team'); para(s.teamDid, { after:10 }); }
+        didKids.forEach(k => { const kk = s.kids[k.id]; nameLine(k.name, (kk.areas || []).map(a => (AREAS.find(x => x.k === a) || {}).label).filter(Boolean)); para(kk.did, { after:10 }); });
+      }
+      const lk = kids.filter(k => { const kk = s.kids && s.kids[k.id]; return !isAbsent(s, k.id) && kk && (has(kk.learned) || (kk.values || []).length); });
+      if (lk.length) {
+        sec('What we learned: Core Values');
+        lk.forEach(k => { const kk = s.kids[k.id]; nameLine(k.name, null, (kk.values || []).filter(v => VMAP[v])); if (has(kk.learned)) para(kk.learned, { after:10 }); else y += 4; });
+      }
+      if (has(s.reflection)) {
+        sec('Team reflection');
+        if (p) p.q.forEach(q => para('- ' + q, { size:9, style:'italic', color:C.ink2, after:1 }));
+        y += 5; para(s.reflection, { after:10 });
+      }
+      const media = opt.photos ? mediaOf(s) : [];
+      if (media.length) {
+        const rowsP = photoGrid(media, capLabel);
+        ensure(34 + rowsP[0].rowH);
+        sec('Photos and sketches');
+        drawPhotos(rowsP);
+      }
+      const hn = s.hwNext || {};
+      const hrows = kids.filter(k => has(hn[k.id])).map(k => [k.name, hn[k.id]]);
+      if (has(hn.team)) hrows.unshift(['Team', hn.team]);
+      if (hrows.length) { sec('Homework for next time'); table([{ label:'Name', w:0.16, bold:true }, { label:'Homework', w:0.84 }], hrows, { size:10 }); }
+      const ev = s.evidence || [];
+      if (ev.length) {
+        const pr = EV_AREAS.map(a => { const st = EV_STEPS.filter(x => ev.includes(`${a.k}:${x}`)); return st.length ? `${a.label}: ${st.join(', ')}` : ''; }).filter(Boolean);
+        para('Judging evidence in this session - ' + pr.join('   |   '), { size:8.5, color:C.ink3 });
+      }
+    });
+  }
+
+  // ---------- Core Values + evidence index ----------
+  if (opt.summary) {
+    part('Core Values', 'Part 5 · Core Values', 'cv');
+    sub('Core Values we practiced', 'cv:tally', 'How many sessions each team member chose each Core Value in their own entry.');
+    const kidsIn = all.filter(k => list.some(s => hasKidData(s, k.id)));
+    if (kidsIn.length) {
+      const w0 = 0.2, wr = (1 - w0 - 0.1) / VALUES.length;
+      const tot = VALUES.map(() => 0);
+      const rows = kidsIn.map(k => { let rt = 0; const cells = VALUES.map((v, i) => { const c = list.filter(s => ((s.kids && s.kids[k.id] && s.kids[k.id].values) || []).includes(v.key)).length; tot[i] += c; rt += c; return String(c); }); return [k.name].concat(cells, [String(rt)]); });
+      rows.push([{ text:'Team', color:C.accent }].concat(tot.map(t => ({ text:String(t), color:C.accent })), [{ text:String(tot.reduce((a, b) => a + b, 0)), color:C.accent }]));
+      table([{ label:'Team member', w:w0, bold:true }].concat(VALUES.map(v => ({ label:v.key, w:wr })), [{ label:'Total', w:0.1, bold:true }]), rows, { size:10 });
+    }
+    const st = recs('stories').map(r => r.data);
+    if (st.length) { sub('Core Values stories', 'cv:stories');
+      table([{ label:'Date', w:0.12 }, { label:'Value', w:0.18, bold:true }, { label:'What happened', w:0.52 }, { label:'Who', w:0.18 }], st.slice().reverse().map(r => [r.date ? fmtDate(r.date) : '', r.value, r.story, names(r.by)])); }
+  }
+
+  // ---------- Evidence index ----------
+  if (opt.summary) {
+    part('Evidence index', 'Where to find it', 'index');
+    para('Where to find evidence for each row of the Innovation Project and Robot Design rubrics. Rows marked (CV) also count toward Core Values.', { size:9.5, color:C.ink2, after:10 });
+    const WHERE = {
+      ip1:['ip:problem'], ip2:['ip:research'], ip3:['ip:plan','ip:ideas'], ip4:['team:who'], ip5:['ip:solution'], ip6:['ip:prototypes'], ip7:['ip:feedback'], ip8:['ip:feedback'], ip9:['ip:solution','ip:summary'], ip10:['team:progress'],
+      rd1:['rd:criteria','rd:strategy'], rd2:['rd:resources'], rd3:['team:who','rd:attachments','rd:programs'], rd4:['team:who','team:roles'], rd5:['rd:robot','rd:attachments'], rd6:['rd:programs'], rd7:['rd:tests','rd:matches'], rd8:['rd:tests'], rd9:['rd:process','sessions'], rd10:['rd:process','team:progress'],
+    };
+    const LABEL = { 'ip:problem':'Our problem', 'ip:research':'Research log', 'ip:plan':'Project plan', 'ip:ideas':'Ideas', 'team:who':'Who did what', 'team:roles':'Jobs', 'ip:solution':'Our solution', 'ip:prototypes':'Prototypes',
+      'ip:feedback':'Sharing and feedback', 'ip:summary':'Summary', 'team:progress':'Team Progress', 'rd:criteria':'How we decide', 'rd:strategy':'Mission strategy', 'rd:resources':'Resources', 'rd:attachments':'Attachments',
+      'rd:programs':'Programs', 'rd:tests':'Test log', 'rd:matches':'Practice matches', 'sessions':'Session pages', 'rd:robot':'Our robot', 'rd:process':'Process and lessons' };
+    const rows = evidence().map(r => {
+      const refs = (WHERE[r.id] || []).filter(k => pageOf.has(k)).map(k => `${LABEL[k]} (p. ${pageOf.get(k)})`);
+      const tagged = list.filter(s => (s.evidence || []).includes(`${r.area}:${r.step}`) && pageOf.has('s:' + s.id)).map(s => `Session ${s.num} (p. ${pageOf.get('s:' + s.id)})`);
+      return [`${r.area === 'ip' ? 'Project' : 'Robot'} · ${r.step}`, r.label + (r.cv ? ' (CV)' : ''), refs.concat(tagged).join(', ') || { text:'Not in this notebook yet', color:C.ink3 }];
+    });
+    table([{ label:'Rubric area', w:0.2, bold:true }, { label:'What judges look for', w:0.36 }, { label:'Where to find it', w:0.44 }], rows, { size:9 });
+  }
+
+  // ---------- Contents ----------
+  if (opt.front && contentsPage) {
+    doc.setPage(contentsPage); y = TOP;
+    font('bold', 22); col(C.ink); txt('Contents', L, y); y += 38;
+    const entries = [];
+    if (pageOf.has('team')) entries.push(['Part 1', 'Our team', pageOf.get('team')]);
+    if (pageOf.has('ip')) entries.push(['Part 2', 'Innovation Project', pageOf.get('ip')]);
+    if (pageOf.has('rd')) entries.push(['Part 3', 'Robot Design', pageOf.get('rd')]);
+    if (pageOf.has('sessions')) { entries.push(['Part 4', 'Session log', pageOf.get('sessions')]);
+      list.forEach(s => { const p = s.tmg && PLAN[s.tmg]; entries.push(['', `Session ${s.num} · ${fmtDate(s.date)} · ${has(s.focus) ? s.focus : (p ? p.t.join(' · ') : '')}`, pageOf.get('s:' + s.id)]); }); }
+    if (pageOf.has('cv')) entries.push(['Part 5', 'Core Values', pageOf.get('cv')]);
+    if (pageOf.has('index')) entries.push(['', 'Evidence index', pageOf.get('index')]);
+    const stepH = Math.max(11, Math.min(20, (H - BOT - 20 - y) / Math.max(1, entries.length)));
+    const fs = stepH < 14 ? 9 : 10.5;
+    entries.forEach(([a, b, pg]) => {
+      font('bold', fs); col(C.accent); txt(T(a), L, y);
+      let t = T(b); font(a ? 'bold' : 'normal', fs); col(C.ink);
+      const maxW = CW - 60 - 40;
+      if (doc.getTextWidth(t) > maxW) { while (t && doc.getTextWidth(t + '...') > maxW) t = t.slice(0, -1); t = t.replace(/\s+$/, '') + '...'; }
+      txt(t, L + 60, y);
+      font('bold', fs); col(C.accent); txt(String(pg), L + CW, y, { align:'right' });
+      y += stepH;
+    });
+  }
+
+  // ---------- Footers ----------
+  const n = page();
+  for (let i = 1; i <= n; i++) {
+    if (opt.front && i === 1) continue;
+    doc.setPage(i);
+    stroke(C.line); doc.setLineWidth(0.5); doc.line(L, H - 44, L + CW, H - 44);
+    font('normal', 8); col(C.ink3);
+    txt(`${tname}${tnum ? ' #' + tnum : ''}  ·  Engineering Notebook  ·  ${season}`, L, H - 38);
+    txt(String(i), L + CW, H - 38, { align:'right' });
+  }
+  if (blank) { font('normal', 12); col(C.ink2); txt('Nothing selected to print.', L, TOP); }
+  doc.setProperties({ title: `${tname} Engineering Notebook`, subject: 'FIRST LEGO League Challenge ' + season, author: tname, creator: 'Team logbook' });
+  return { blob: doc.output('blob'), pages: n };
+}
+
+
+function boot() {
+  if (S.pin) S.role = LS.get('mb.role') || null;
+  loadCache();
+  render();
+  if (S.pin && /^https:\/\//.test(API_URL)) sync(true).then(() => { if (P.size) schedule(200); });
+  setInterval(() => sync(false), 15000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sync(true); else flush(); });
+  window.addEventListener('online', () => { Q.failed = false; Q.retries = 0; flush(); sync(true); });
+  window.addEventListener('pagehide', () => { flush(); });
+}
+boot();
+
+})();
+</script>
+</body>
+</html>
