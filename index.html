@@ -1243,7 +1243,7 @@ function step(n, title, hint, ...content) {
 function deleteCtl(path, label) {
   if (!canWrite()) return null;
   return region('delctl', () => S.confirm === path
-    ? h('span', { class:'confirm' }, h('span', null, 'Delete for good?'),
+    ? h('span', { class:'confirm' }, h('span', null, 'Delete this? A coach can bring it back.'),
         h('button', { class:'btn danger small', 'data-key':'del-yes', onclick: () => { S.confirm = null; queuePatch(path, { _deleted: true }); flush(); refresh(); } }, 'Delete'),
         h('button', { class:'btn small', 'data-key':'del-no', onclick: () => { S.confirm = null; refresh(); } }, 'Keep'))
     : h('button', { class:'linkbtn quiet', 'data-key':'del', onclick: () => { S.confirm = path; refresh(); } }, label || 'Delete'),
@@ -1293,9 +1293,10 @@ function renderHome(main) {
       today ? h('p', { class:'plan-line' }, has(today.focus) ? today.focus : (today.tmg && PLAN[today.tmg] ? PLAN[today.tmg].t.join(' · ') : '')) : (p ? h('p', { class:'plan-line' }, `Team Meeting Guide plan, Session ${tmg}: ${p.t.join(' · ')}`) : null),
       h('div', { class:'actions' },
         today ? h('button', { class:'btn primary', onclick: () => openSession(today.id, me && sessionKids(today).some(k => k.id === me.id) ? me.id : 'team') }, me ? `Open my page, ${me.name}` : 'Open today’s session')
-              : h('button', { class:'btn primary', onclick: openNewSession }, `+ Start Session ${n}`),
+              : S.role === 'coach' ? h('button', { class:'btn primary', onclick: openNewSession }, `+ Start Session ${n}`) : null,
         !today && last ? h('button', { class:'btn', onclick: () => openSession(last.id) }, `Open Session ${last.num}`) : null,
-        today ? h('button', { class:'btn', onclick: openNewSession }, '+ New session') : null)),
+        today && S.role === 'coach' ? h('button', { class:'btn', onclick: openNewSession }, '+ New session') : null),
+      !today && S.role !== 'coach' ? h('p', { class:'hint' }, 'Your coach starts today’s session. Then your page shows up here.') : null),
     h('ol', { class:'howto', 'aria-label':'How a session works' },
       h('li', null, h('span', null, h('b', null, 'Start of the meeting: '), 'the coach starts the session and picks the plan.')),
       h('li', null, h('span', null, h('b', null, 'Last 15 minutes: '), 'everyone opens their own page and fills in 5 short steps.')),
@@ -1490,6 +1491,9 @@ function renderTeamTab(body) {
   const path = SP(S.openId); const s = view(path);
   body.setAttribute('style', '');
   const p = s.tmg && PLAN[s.tmg];
+  const coach = S.role === 'coach'; const wasRO = RO;
+  if (!coach) RO = true;                                 // session details and attendance: coaches only
+  try {
   const numI = lineInput(path, 'num', 'number');
   numI.addEventListener('input', () => { const e = $('#snum'); if (e && numI.value) e.textContent = `Session ${numI.value}`; });
   const date = lineInput(path, 'date', 'date');
@@ -1498,10 +1502,10 @@ function renderTeamTab(body) {
   tmg.value = String(s.tmg || 0);
   tmg.addEventListener('change', () => { edit(path, 'tmg', num(tmg.value)); flush(); render(); });
   body.append(h('div', { class:'kidhead' }, h('div', null, h('h3', null, 'Team page'), h('p', { class:'muted' }, 'Fill this together. One person types, everyone helps.'))));
-  body.append(step(1, 'Session details', null,
+  body.append(step(1, 'Session details', coach ? null : 'Only a coach changes these.',
     h('div', { class:'grid4' }, field(fid(path, 'num'), 'Number', numI), field(fid(path, 'date'), 'Date', date), field(fid(path, 'tmg'), 'Plan', tmg)),
     field(fid(path, 'focus'), 'Today’s focus', lineInput(path, 'focus', 'text', { placeholder:'One line: what is today mainly about?', max:140 }))));
-  body.append(step(2, 'Who is here today', 'Tap a name to mark someone absent.',
+  body.append(step(2, 'Who is here today', coach ? 'Tap a name to mark someone absent.' : 'Only a coach changes who is here.',
     region('toggles', () => {
       const d = view(path); const inS = sessionKids(d);
       const extra = activeKids().filter(k => !inS.some(x => x.id === k.id));
@@ -1515,6 +1519,7 @@ function renderTeamTab(body) {
           onclick: () => { edit(path, 'present.' + k.id, true); edit(path, 'added.' + k.id, true); refresh(); } }, `+ Add ${k.name} to this session`)),
       ];
     }, () => JSON.stringify([getPath(view(path), 'present'), getPath(view(path), 'added'), roster()]))));
+  } finally { RO = wasRO; }
   body.append(step(3, 'What we did as a team', 'A short summary of the whole session.',
     textBox(path, 'teamDid', { rows:4, max:2000, placeholder:'Example: We tested the new drive base on the mat and picked 3 missions to try first. Then we read about animals that glow.' })));
   body.append(step(4, 'Team reflection', p ? 'Talk about these questions together, then write the team’s answers.' : 'Pick a plan session above to see reflection questions.',
