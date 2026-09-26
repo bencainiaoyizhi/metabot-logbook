@@ -877,7 +877,7 @@ async function sync(force) {
     if (changed || first) { bump(); softRefresh(); }
     if (P.size && !Q.inflight) schedule(300);
   } catch (e) {
-    if (!authFailed(e)) { S.online = false; S.syncErr = true; paintNet(); if (!S.loaded) render(); }
+    if (!authFailed(e)) { S.online = false; S.syncErr = true; S.syncErrCode = e && e.code; paintNet(); if (!S.loaded) render(); }
   } finally { S.syncing = false; }
 }
 function paintNet() {
@@ -969,7 +969,9 @@ function render() {
   if (!/^https:\/\//.test(API_URL)) { main.append(panel('Not connected yet', 'This logbook page is not linked to its Google script yet. The coach finishes the setup, then this page works.')); return; }
   if (!S.pin) { main.append(lockCard()); return; }
   if (!S.loaded) {
-    main.append(S.syncErr
+    main.append(S.syncErr && S.syncErrCode === 'not_set_up'
+      ? panel('Not set up yet', 'The coach has not finished setting up the logbook script. Ask your coach, then try again.', h('div', null, h('button', { class:'btn primary', onclick: () => { S.syncErr = false; render(); sync(true); } }, 'Try again')))
+      : S.syncErr
       ? panel('Can’t reach the logbook', 'Check the Wi-Fi, then try again. Anything you typed on this device is kept and will save later.', h('div', null, h('button', { class:'btn primary', onclick: () => { S.syncErr = false; render(); sync(true); } }, 'Try again')))
       : h('div', { class:'loading' }, 'Opening the logbook…'));
     return;
@@ -1023,7 +1025,7 @@ function lockCard() {
       render();
     } catch (err) {
       st.className = 'status err';
-      st.textContent = err.code === 'bad_code' ? 'That code is not right. Check it with your coach.' : err.code === 'locked' ? 'Too many wrong codes. Wait 15 minutes.' : 'Could not reach the logbook. Check the Wi-Fi and try again.';
+      st.textContent = err.code === 'bad_code' ? 'That code is not right. Check it with your coach.' : err.code === 'locked' ? 'Too many wrong codes. Wait 15 minutes.' : err.code === 'not_set_up' ? 'The logbook is not set up yet. Ask your coach.' : 'Could not reach the logbook. Check the Wi-Fi and try again.';
       btn.disabled = false;
     }
   } },
@@ -1670,6 +1672,7 @@ function uploadError(e, f) {
   if (code === 'decode') return `${nm} could not be opened. Try taking the photo again, or save it as JPEG.`;
   if (code === 'photo_too_large') return `${nm} is too big. Try a smaller photo.`;
   if (code === 'network') return 'The photo was not saved: no connection. Check the Wi-Fi and add it again.';
+  if (code === 'upload_limit') return 'The team has added the most photos allowed for today (300). Add this one tomorrow.';
   return 'The photo was not saved. Try again.';
 }
 
