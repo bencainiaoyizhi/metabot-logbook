@@ -996,7 +996,7 @@ function renderHeader() {
   right.append(
     h('span', { id:'netdot', class:'netdot' }),
     h('button', { id:'savepill', class:'save', type:'button', onclick: () => { if (saveState() === 'error' || saveState() === 'offline') { Q.failed = false; Q.retries = 0; flush(); } } }),
-    h('button', { class:'btn who', type:'button', onclick: openWho, title:'Change who is using this device' }, me ? avatar(me, 'sm') : null, me ? me.name : 'Coach / parent'));
+    h('button', { class:'btn who', type:'button', onclick: openWho, title:'Change who is using this device' }, me ? avatar(me, 'sm') : null, me ? me.name : 'Coach'));
   paintSave(); paintNet();
   const cur = S.view === 'session' ? 'home' : S.view;
   NAV.forEach(n => nav.append(h('button', { class:'navtab', type:'button', 'aria-current': cur === n.v ? 'page' : null, onclick: () => go(n.v) }, n.label)));
@@ -1036,7 +1036,7 @@ function lockCard() {
 function whoButtons(onPick) {
   return h('div', { class:'whogrid' },
     activeKids().map(k => h('button', { class:'whobtn', type:'button', style:`--kid:${kidColor(k)}`, onclick: () => onPick(k.id) }, avatar(k, 'lg'), h('span', null, k.name))),
-    h('button', { class:'whobtn', type:'button', onclick: () => onPick('coach') }, h('span', { class:'av lg', style:'--kid:#56655E' }, '★'), h('span', null, 'Coach or parent')));
+    h('button', { class:'whobtn', type:'button', onclick: () => onPick('coach') }, h('span', { class:'av lg', style:'--kid:#56655E' }, '★'), h('span', null, 'Coach')));
 }
 function setWho(id) { S.who = id; LS.set('mb.who', id); }
 function whoCard() {
