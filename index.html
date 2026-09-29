@@ -649,7 +649,8 @@ function setPath(o, p, v) {
 }
 const pathObj = (p, v) => { const o = {}; setPath(o, p, v); return o; };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const frame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+// Yield to the browser. requestAnimationFrame never fires in a hidden tab (iPad app switch, side panel), so a timer backs it up.
+const frame = () => new Promise(r => { let done = false; const go = () => { if (!done) { done = true; setTimeout(r, 0); } }; requestAnimationFrame(go); setTimeout(go, 120); });
 function todayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 function parseDate(s) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
 function fmtDate(s, long) {
