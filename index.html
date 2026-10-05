@@ -668,7 +668,7 @@ function dateStrOf(ms) { const d = new Date(ms); return `${d.getFullYear()}-${St
 function enteredLater(s) {
   const d = parseDate(s && s.date); if (!d || !s.createdAt) return null;
   const made = parseDate(dateStrOf(s.createdAt));
-  return made && (made - d) >= 2 * 86400000 ? dateStrOf(s.createdAt) : null;
+  return made && Math.round((made - d) / 86400000) >= 2 ? dateStrOf(s.createdAt) : null;   // rounded: a DST change makes a day 23 or 25 hours
 }
 const words = s => ((s || '').trim().match(/\S+/g) || []).length;
 const has = s => !!(s && String(s).trim());
@@ -1045,11 +1045,11 @@ function lockCard() {
     }
   }
   const names = h('div', { class:'whogrid', id:'names' }, h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'Loading names…'));
-  const inp = h('input', { type:'text', id:'code', autocomplete:'off', autocapitalize:'off', spellcheck:'false', placeholder:'Coach code' });
+  const inp = h('input', { type:'password', id:'code', autocomplete:'off', autocapitalize:'off', spellcheck:'false', placeholder:'Coach code' });
   const btn = h('button', { class:'btn primary', type:'submit' }, 'Open the logbook');
-  const coachForm = h('form', { class:'coachform', hidden:true, onsubmit: e => { e.preventDefault(); const code = inp.value.trim(); if (code) signIn(code); } },
+  const coachForm = h('form', { class:'coachform', id:'coachform', hidden:true, onsubmit: e => { e.preventDefault(); const code = inp.value.trim(); if (code) signIn(code); } },
     field('code', 'Coach code', inp), h('div', null, btn));
-  const coachLink = h('button', { class:'linkbtn', type:'button', id:'iamcoach', onclick: () => { coachForm.hidden = !coachForm.hidden; if (!coachForm.hidden) setTimeout(() => inp.focus(), 30); } }, 'I am a coach');
+  const coachLink = h('button', { class:'linkbtn', type:'button', id:'iamcoach', 'aria-expanded':'false', 'aria-controls':'coachform', onclick: () => { coachForm.hidden = !coachForm.hidden; coachLink.setAttribute('aria-expanded', String(!coachForm.hidden)); if (!coachForm.hidden) setTimeout(() => inp.focus(), 30); } }, 'I am a coach');
   const card = h('div', { class:'panel lock' },
     h('h3', null, 'Welcome to the team logbook'),
     h('p', { class:'muted' }, 'Tap your name. You only need to do this once on this device.'),
@@ -1058,8 +1058,9 @@ function lockCard() {
     try {
       const r = await api('roster', {}, '');
       const kids = (r && r.kids) || [];
-      names.replaceChildren(...(kids.length ? kids.map((k, i) => h('button', { class:'whobtn', type:'button', 'data-kid': k.id, style:`--kid:${KID_COLORS[i % KID_COLORS.length]}`, onclick: () => signIn(k.id, `Opening ${k.name}’s page…`) },
-        h('span', { class:'av lg', style:`--kid:${KID_COLORS[i % KID_COLORS.length]}`, 'aria-hidden':'true' }, kidShort(k.name)), h('span', null, k.name))) : [h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'No names yet. Ask your coach.')]));
+      const colorOf = (k, i) => KID_COLORS[(Number.isInteger(k.i) ? k.i : i) % KID_COLORS.length];   // same color as inside the logbook (roster position)
+      names.replaceChildren(...(kids.length ? kids.map((k, i) => h('button', { class:'whobtn', type:'button', 'data-kid': k.id, style:`--kid:${colorOf(k, i)}`, onclick: () => signIn(k.id, `Opening ${k.name}’s page…`) },
+        h('span', { class:'av lg', style:`--kid:${colorOf(k, i)}`, 'aria-hidden':'true' }, kidShort(k.name)), h('span', null, k.name))) : [h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'No names yet. Ask your coach.')]));
       if (r && r.error === 'not_set_up') { st.className = 'status err'; st.textContent = signInMsg({ code:'not_set_up' }); }
     } catch (err) {
       names.replaceChildren(h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'Could not load the names.'));
@@ -1537,8 +1538,15 @@ function renderTeamTab(body) {
   try {
   const numI = lineInput(path, 'num', 'number');
   numI.addEventListener('input', () => { const e = $('#snum'); if (e && numI.value) e.textContent = `Session ${numI.value}`; });
+  const helpersI = lineInput(path, 'helpers', 'text', { placeholder:'Example: Mentors from FLL Team 35702 taught us Pybricks', max:200 });
+  helpersI.addEventListener('input', () => {                       // header line follows while typing
+    let e = $('#shelpers'); const v = helpersI.value.trim();
+    if (!v) { if (e) e.remove(); return; }
+    if (!e) { e = h('p', { class:'planline', id:'shelpers' }); const later = document.querySelector('.planline.later'); const head = document.querySelector('.shead > div'); if (later) later.before(e); else if (head) head.append(e); }
+    e.textContent = `Helpers: ${v}`;
+  });
   const date = lineInput(path, 'date', 'date');
-  date.addEventListener('change', () => { const e = $('#sdate'); if (e && date.value) e.textContent = fmtDate(date.value, true); });
+  date.addEventListener('change', () => { flush(); render(); });   // header date and the "looking back" line follow
   const tmg = h('select', { id: fid(path, 'tmg'), 'data-bind': path + '::tmg', disabled: !canWrite() }, h('option', { value:'0' }, 'Not in the plan'), Object.keys(PLAN).map(k => h('option', { value:k }, `Session ${k}: ${PLAN[k].t.join(' · ')}`)));
   tmg.value = String(s.tmg || 0);
   tmg.addEventListener('change', () => { edit(path, 'tmg', num(tmg.value)); flush(); render(); });
@@ -1546,7 +1554,7 @@ function renderTeamTab(body) {
   body.append(step(1, 'Session details', coach ? null : 'Only a coach changes these.',
     h('div', { class:'grid4' }, field(fid(path, 'num'), 'Number', numI), field(fid(path, 'date'), 'Date', date), field(fid(path, 'tmg'), 'Plan', tmg)),
     field(fid(path, 'focus'), 'Today’s focus', lineInput(path, 'focus', 'text', { placeholder:'One line: what is today mainly about?', max:140 })),
-    field(fid(path, 'helpers'), 'Helpers today (mentors, visitors, experts)', lineInput(path, 'helpers', 'text', { placeholder:'Example: Mentors from FLL Team 35702 taught us Pybricks', max:200 })),
+    field(fid(path, 'helpers'), 'Helpers today (mentors, visitors, experts)', helpersI),
     enteredLater(s) ? h('p', { class:'hint' }, `This session was added on ${fmtDate(enteredLater(s))}, after it happened. The notebook marks it as written looking back, which is fine: judges prefer an honest catch-up to a blank.`) : null));
   body.append(step(2, 'Who is here today', coach ? 'Tap a name to mark someone absent.' : 'Only a coach changes who is here.',
     region('toggles', () => {
