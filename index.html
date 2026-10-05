@@ -378,6 +378,10 @@ body{padding-bottom:env(safe-area-inset-bottom,0px)}
 
 @media (pointer:coarse){input,select,textarea{font-size:16px}}
 
+.given.tasks{margin-bottom:4px}
+.tasklist{margin:4px 0 0;padding-left:20px;font-size:1.02rem;display:grid;gap:2px}
+.given a.small{font-size:.85rem;color:var(--accent);font-weight:700}
+
 </style>
 </head>
 <body>
@@ -419,32 +423,8 @@ const VALUES = [
 const VMAP = Object.fromEntries(VALUES.map(v => [v.key, v]));
 
 // Team Meeting Guide 2026-27: topic titles from the guide; reflection prompts are our own short versions.
-const PLAN = {
-  1:{ t:['BIOGLOW theme and project exploration','Build the mission models'], cv:'',
-      q:['Which mission model is most interesting to you, and why?','How do the mission models connect to real problems for living things?','How will our team have fun this season?'] },
-  2:{ t:['Tutorial activities (optional)','Training Camp 1: Driving Around','Explore Project Sparks'], cv:'Discovery',
-      q:['What new building or coding skill did you learn today?','Which Project Spark caught your attention?','How could we find out more about it?'] },
-  3:{ t:['Training Camp 2: Playing with Objects','Identify project problem'], cv:'',
-      q:['What do we still need to find out before we pick our problem?','What should our robot stay away from on the field?','Which mission should we try next?'] },
-  4:{ t:['Training Camp 3: Reacting to Lines','Research project solutions'], cv:'',
-      q:['Where will we keep our research notes?','How did testing change your program?','Could the lines on the mat help the robot find its way?'] },
-  5:{ t:['Guided mission','Research project solutions'], cv:'Teamwork',
-      q:['Which expert could we ask about our problem? What would we ask?','How will we share the work on our solution?','What did the guided mission teach you that helps with other missions?'] },
-  6:{ t:['Pseudocode and mission strategy','Develop project solution'], cv:'Innovation',
-      q:['What is our next step for the project solution?','How does writing things down help us in the judging room?','How do our attachments and code fit our mission plan?'] },
-  7:{ t:['Develop robot design','Develop project solution'], cv:'Gracious Professionalism',
-      q:['Can you explain our solution so a younger kid understands it?','Who could give us feedback?','What would you change about the robot or an attachment?'] },
-  8:{ t:['Practice solving robot game missions','Collect feedback on solution'], cv:'Inclusion',
-      q:['What feedback did we get, and what will we change?','How do we choose which missions to try?','In what order will we run the missions?'] },
-  9:{ t:['Iterate and improve robot solution','Iterate and improve project solution'], cv:'Impact',
-      q:['How will we show Core Values at the event?','What is new or different about our solution?','What did we change after testing or feedback?'] },
-  10:{ t:['Iterate and improve robot solution','Plan project presentation'], cv:'Coopertition',
-      q:['How will we know our solution really helps?','What are we most proud of?','What skills have you grown this season?'] },
-  11:{ t:['Plan robot design explanation','Practice project presentation'], cv:'Fun',
-      q:['Which parts of the robot show our design process?','Does our presentation show what everyone did?','What has FLL changed for you?'] },
-  12:{ t:['Practice robot game matches','Practice full presentations'], cv:'',
-      q:['What have we accomplished?','What will we do if a mission fails during a match?','What still needs work before the event?'] },
-};
+// Team reflection prompts (the same every session; the coach can steer the talk).
+const REFLECT = ['What went well today, and why?', 'What was hard, and what did we try?', 'What will we do differently next time?', 'Which Core Value showed up today, and how?'];
 const HW = [
   { k:'done',   label:'Done',        cls:'ok'  },
   { k:'partly', label:'Partly done', cls:'mid' },
@@ -722,6 +702,7 @@ const S = {
   docs: new Map(), since: 0, loaded: false, online: true, lastSync: 0, syncing: false,
   view: 'home', openId: null, tab: 'team', section: null, confirm: null,
   thumbs: new Map(), thumbWant: new Set(), ver: 0, setup: { name:'', number:'', coaches:'', kids:['', '', '', ''] },
+  tasks: null, tasksAt: 0, tasksLoading: false,       // Trello cards (see loadTasks)
 };
 const P = new Map();                               // doc path -> changes not yet saved (kept across reloads)
 const Q = { timer:null, inflight:null, failed:false, retries:0, err:'', errCode:'', stuck:new Set() };
@@ -919,10 +900,32 @@ async function sync(force) {
     const first = !S.loaded; S.loaded = true;
     S.syncErr = false;
     if (changed || first) { bump(); softRefresh(); }
+    if (first) loadTasks();
     if (P.size && !Q.inflight) schedule(300);
   } catch (e) {
     if (!authFailed(e)) { S.online = false; S.syncErr = true; S.syncErrCode = e && e.code; paintNet(); if (!S.loaded) render(); }
   } finally { S.syncing = false; }
+}
+// Trello cards for the team (read-only, through the script). Refreshed at most every 5 minutes; a failure just hides the block.
+async function loadTasks(force) {
+  if (!S.pin || S.tasksLoading) return;
+  if (!force && S.tasks && Date.now() - S.tasksAt < 5 * 60000) return;
+  S.tasksLoading = true;
+  try { const r = await api('tasks', {}); S.tasks = { connected: !!r.connected, error: r.error || '', items: Array.isArray(r.items) ? r.items : [] }; S.tasksAt = Date.now(); bump(); softRefresh(); }
+  catch (e) { if (!S.tasks) S.tasks = { connected: false, error: 'network', items: [] }; }
+  finally { S.tasksLoading = false; }
+}
+// The Trello card that was due for this session: the kid's latest card due on or before the session date (up to 3 days after it counts too).
+function taskCardFor(kidId, s) {
+  if (!S.tasks || !S.tasks.connected || !s || !s.date) return null;
+  const limit = dateStrOf(parseDate(s.date).getTime() + 3 * 86400000);
+  const mine = S.tasks.items.filter(t => t.kid === kidId && t.due && t.due <= limit).sort((a, b) => a.due.localeCompare(b.due));
+  return mine.length ? mine[mine.length - 1] : null;
+}
+// Card text as a plain list for the notebook: "Week 2 (due Sat, Oct 3): Do research; Review scoring rules"
+function taskText(card) {
+  const lines = String(card.text || '').split('\n').map(l => l.replace(/^\s*[-*•]\s*/, '').trim()).filter(Boolean);
+  return `${card.list ? card.list + ' ' : ''}(due ${fmtDate(card.due)}): ${lines.join('; ')}`.trim();
 }
 function paintNet() {
   const n = $('#netdot'); if (!n) return;
@@ -1336,7 +1339,6 @@ function sessions() {
 }
 function prevOf(id) { const l = sessions(); const i = l.findIndex(x => x.id === id); return i > 0 ? l[i - 1] : null; }
 function nextNum(l) { return l.reduce((m, s) => Math.max(m, num(s.num)), 0) + 1; }
-function nextPlan(l) { const lp = [...l].reverse().find(s => num(s.tmg) > 0); return Math.min(12, lp ? num(lp.tmg) + 1 : nextNum(l)); }
 function hasKidData(s, id) { const k = s && s.kids && s.kids[id]; return !!(k && (has(k.did) || has(k.learned) || k.hw || (k.values && k.values.length))); }
 function sessionKids(s) {
   const pr = s && s.present;
@@ -1362,12 +1364,11 @@ function renderHome(main) {
   const n = nextNum(l); const last = l[l.length - 1];
   const today = l.filter(s => s.date === todayStr()).pop();
   const me = meKid();
-  const tmg = nextPlan(l); const p = PLAN[tmg];
   main.append(h('section', { class:'panel upnext' },
     h('div', null,
       today ? h('div', { class:'mono', style:'color:var(--accent)' }, 'Today') : h('div', { class:'mono', style:'color:var(--accent)' }, l.length ? 'Up next' : 'Start here'),
       h('h2', { class:'big' }, today ? `Session ${today.num}` : `Session ${n}`),
-      today ? h('p', { class:'plan-line' }, has(today.focus) ? today.focus : (today.tmg && PLAN[today.tmg] ? PLAN[today.tmg].t.join(' · ') : '')) : (p ? h('p', { class:'plan-line' }, `Team Meeting Guide plan, Session ${tmg}: ${p.t.join(' · ')}`) : null),
+      today && has(today.focus) ? h('p', { class:'plan-line' }, today.focus) : null,
       h('div', { class:'actions' },
         today ? h('button', { class:'btn primary', onclick: () => openSession(today.id, me && sessionKids(today).some(k => k.id === me.id) ? me.id : 'team') }, me ? `Open my page, ${me.name}` : 'Open today’s session')
               : S.role === 'coach' ? h('button', { class:'btn primary', onclick: openNewSession }, `+ Start Session ${n}`) : null,
@@ -1375,7 +1376,7 @@ function renderHome(main) {
         today && S.role === 'coach' ? h('button', { class:'btn', onclick: openNewSession }, '+ New session') : null),
       !today && S.role !== 'coach' ? h('p', { class:'hint' }, 'Your coach starts today’s session. Then your page shows up here.') : null),
     h('ol', { class:'howto', 'aria-label':'How a session works' },
-      h('li', null, h('span', null, h('b', null, 'Start of the meeting: '), 'the coach starts the session and picks the plan.')),
+      h('li', null, h('span', null, h('b', null, 'Start of the meeting: '), 'the coach starts the session and writes today’s focus.')),
       h('li', null, h('span', null, h('b', null, 'Last 15 minutes: '), 'everyone opens their own page and fills in 4 short steps.')),
       h('li', null, h('span', null, h('b', null, 'During the week: '), 'add research, tests, attachments and feedback in Project and Robot.')))));
   if (l.length) {
@@ -1383,17 +1384,16 @@ function renderHome(main) {
       h('div', { class:'sec-title', style:'margin-bottom:10px' }, h('h2', { id:'lh' }, 'Sessions in the logbook'), h('span', { class:'count-chip' }, `${l.length} session${l.length === 1 ? '' : 's'}`)),
       h('div', { class:'slist' }, [...l].reverse().map(s => sessionRow(s, l)))));
   }
-  main.append(planSection(l));
 }
 function sessionRow(s, l) {
   const i = l.findIndex(x => x.id === s.id); const prev = i > 0 ? l[i - 1] : null;
   const kids = sessionKids(s);
   const vs = new Set(); kids.forEach(k => ((s.kids && s.kids[k.id] && s.kids[k.id].values) || []).forEach(v => vs.add(v)));
-  const title = has(s.focus) ? s.focus : (s.tmg && PLAN[s.tmg] ? PLAN[s.tmg].t.join(' · ') : 'No focus written yet');
+  const title = has(s.focus) ? s.focus : 'No focus written yet';
   const photos = mediaOf(s).length;
   return h('button', { class:'srow', onclick: () => openSession(s.id) },
     h('span', { class:'n' }, String(s.num ?? '?')),
-    h('span', { class:'mid' }, h('span', { class:'t' }, title), h('span', { class:'d' }, fmtDate(s.date) + (s.tmg ? ` · plan S${s.tmg}` : ''))),
+    h('span', { class:'mid' }, h('span', { class:'t' }, title), h('span', { class:'d' }, fmtDate(s.date))),
     h('span', { class:'meta' },
       h('span', { class:'dots', title:'Team members who finished their page' }, kids.map(k => {
         const pr = kidProgress(s, k, prev); const absent = isAbsent(s, k.id);
@@ -1403,38 +1403,22 @@ function sessionRow(s, l) {
       vs.size ? h('span', { class:'vdots', title:[...vs].join(', ') }, [...vs].filter(v => VMAP[v]).map(v => h('span', { class:'vdot', style:`--vc:var(${VMAP[v].css})` }))) : null,
       h('span', { class:'count-chip' }, `${photos} photo${photos === 1 ? '' : 's'}`)));
 }
-function planSection(l) {
-  const logged = {};
-  l.forEach(s => { if (s.tmg) (logged[s.tmg] = logged[s.tmg] || []).push(s.num); });
-  return h('section', { 'aria-labelledby':'ph' },
-    h('div', { class:'sec-title', style:'margin-bottom:10px' }, h('h2', { id:'ph' }, 'The 12-session plan'), h('span', { class:'count-chip' }, 'Team Meeting Guide 2026–27')),
-    h('div', { class:'plan' }, Object.keys(PLAN).map(Number).map(k => {
-      const p = PLAN[k]; const lg = logged[k];
-      return h('div', { class:'pcard' + (lg ? ' done' : '') },
-        h('div', { class:'ph' }, h('span', { class:'mono', style:'color:var(--accent)' }, `Session ${k}`), p.cv ? h('span', { class:'cvtag' }, p.cv) : null),
-        h('ul', null, p.t.map(t => h('li', null, t))),
-        h('div', { class:'st' }, lg ? `Logged as Session ${lg.join(', ')}` : 'Not logged yet'));
-    })));
-}
 function openNewSession() {
   const l = sessions(); const n = nextNum(l);
   const numI = h('input', { type:'number', id:'ns-num', min:'1', step:'1', value:String(n) });
   const date = h('input', { type:'date', id:'ns-date', value:todayStr() });
-  const tmg = h('select', { id:'ns-tmg' }, h('option', { value:'0' }, 'Not in the plan'), Object.keys(PLAN).map(k => h('option', { value:k }, `Session ${k}: ${PLAN[k].t.join(' · ')}`)));
-  tmg.value = String(nextPlan(l));
   const focus = h('input', { type:'text', id:'ns-focus', maxlength:'140', placeholder:'Example: Test the drive base and pick our first 3 missions' });
   const helpers = h('input', { type:'text', id:'ns-helpers', maxlength:'200', placeholder:'Example: Mentors from FLL Team 35702' });
   const go1 = h('button', { class:'btn primary', onclick: () => {
     const id = newId();
     const present = {};
     activeKids().forEach(k => { present[k.id] = true; });
-    queuePatch(SP(id), { num: num(numI.value) || n, date: date.value || todayStr(), tmg: num(tmg.value), focus: focus.value.trim(), helpers: helpers.value.trim(), teamDid:'', reflection:'', present, media:{}, createdAt: Date.now() });
+    queuePatch(SP(id), { num: num(numI.value) || n, date: date.value || todayStr(), focus: focus.value.trim(), helpers: helpers.value.trim(), teamDid:'', reflection:'', present, media:{}, createdAt: Date.now() });
     close(); flush();
     const me = meKid(); openSession(id, me ? me.id : 'team');
   } }, 'Create session');
   const close = dialog('Start a new session', [
     h('div', { class:'grid2' }, field('ns-num', 'Session number', numI), field('ns-date', 'Date', date)),
-    field('ns-tmg', 'Follows the Team Meeting Guide plan', tmg),
     field('ns-focus', 'Today’s focus (optional)', focus),
     field('ns-helpers', 'Helpers today (optional): mentors, visitors, experts', helpers),
     h('p', { class:'hint' }, 'Catching up on a past meeting? Set its real date. The notebook then marks the session as written looking back.'),
@@ -1448,16 +1432,16 @@ function openSession(id, tab) {
   const me = meKid();
   S.tab = tab || (me && sessionKids(s).some(k => k.id === me.id) ? me.id : 'team');
   render(); window.scrollTo(0, 0);
+  loadTasks();
 }
 function renderSession(main) {
   const path = SP(S.openId); const s = view(path);
   if (!s) { main.append(panel('This session is not available', 'It may have been deleted.')); return; }
-  const p = s.tmg && PLAN[s.tmg];
   main.append(h('div', { class:'shead' },
     h('div', null,
       h('div', { class:'eyebrow mono', id:'sdate' }, fmtDate(s.date, true)),
       h('h2', { class:'stitle', id:'snum' }, `Session ${s.num ?? ''}`),
-      p ? h('p', { class:'planline' }, `Plan: Team Meeting Guide Session ${s.tmg} · ${p.t.join(' · ')}`) : null,
+      has(s.focus) ? h('p', { class:'planline' }, s.focus) : null,
       has(s.helpers) ? h('p', { class:'planline', id:'shelpers' }, `Helpers: ${s.helpers}`) : null,
       enteredLater(s) ? h('p', { class:'planline later' }, `Written on ${fmtDate(enteredLater(s))}, looking back.`) : null),
     h('button', { class:'btn', onclick: () => go('home') }, '← All sessions')));
@@ -1522,9 +1506,22 @@ function renderKidTabInner(body, kid) {
   body.append(h('div', { class:'rolebar' }, h('span', { class:'lbl' }, 'My job today'),
     chipsInput(path, base + '.role', ROLES.map(r => ({ k:r.k, label:r.label })), true)));
 
-  body.append(step(1, 'My tasks since last time', 'Your tasks are in Trello. Did you finish them?',
+  const card = taskCardFor(kid.id, s);
+  const saved = getPath(view(path), base + '.tasks');                      // the card text as it was when the status was set (what the PDF prints)
+  const taskBlock = card
+    ? h('div', { class:'given tasks' },
+        h('span', { class:'lab mono' }, `Your tasks from Trello · ${card.list || 'card'} · due ${fmtDate(card.due)}${card.done || card.labels.includes('done') ? ' · marked done in Trello' : ''}`),
+        h('ul', { class:'tasklist' }, String(card.text || '').split('\n').map(l => l.replace(/^\s*[-*•]\s*/, '').trim()).filter(Boolean).map(l => h('li', null, l))),
+        card.url ? h('a', { class:'small', href: card.url, target:'_blank', rel:'noopener' }, 'Open in Trello') : null)
+    : has(saved) ? h('div', { class:'given tasks' }, h('span', { class:'lab mono' }, 'Your tasks (from Trello)'), h('span', { class:'txt' }, saved))
+    : S.tasks && S.tasks.connected && !S.tasks.error ? h('p', { class:'hint' }, 'No Trello card was due for you before this session.')
+    : S.tasks && S.tasks.error ? h('p', { class:'hint' }, 'Trello could not be read right now. Your tasks are still in Trello.')
+    : null;
+  body.append(step(1, 'My tasks since last time', 'Your tasks are in Trello. Did you finish them?', taskBlock,
     region('choices', () => HW.map(o => h('button', { class:'choice ' + o.cls, type:'button', 'data-key':'hw-' + o.k, 'aria-pressed': String((getPath(view(path), base + '.hw') || '') === o.k), disabled: !canWrite(),
-      onclick: () => { const cur = getPath(view(path), base + '.hw') || ''; edit(path, base + '.hw', cur === o.k ? '' : o.k); refresh(); } }, o.label)),
+      onclick: () => { const cur = getPath(view(path), base + '.hw') || ''; edit(path, base + '.hw', cur === o.k ? '' : o.k);
+        const c = taskCardFor(kid.id, view(path)); if (c) edit(path, base + '.tasks', taskText(c));   // keep a copy of the tasks with the answer
+        refresh(); } }, o.label)),
       () => String(getPath(view(path), base + '.hw') || '')),
     textBox(path, base + '.hwNote', { small:true, rows:2, max:400, placeholder:'What did you do or bring? One line. (optional)' })));
 
@@ -1564,7 +1561,6 @@ function exampleBox() {
 function renderTeamTab(body) {
   const path = SP(S.openId); const s = view(path);
   body.setAttribute('style', '');
-  const p = s.tmg && PLAN[s.tmg];
   const coach = S.role === 'coach'; const wasRO = RO;
   if (!coach) RO = true;                                 // session details and attendance: coaches only
   try {
@@ -1579,12 +1575,9 @@ function renderTeamTab(body) {
   });
   const date = lineInput(path, 'date', 'date');
   date.addEventListener('change', () => { flush(); render(); });   // header date and the "looking back" line follow
-  const tmg = h('select', { id: fid(path, 'tmg'), 'data-bind': path + '::tmg', disabled: !canWrite() }, h('option', { value:'0' }, 'Not in the plan'), Object.keys(PLAN).map(k => h('option', { value:k }, `Session ${k}: ${PLAN[k].t.join(' · ')}`)));
-  tmg.value = String(s.tmg || 0);
-  tmg.addEventListener('change', () => { edit(path, 'tmg', num(tmg.value)); flush(); render(); });
   body.append(h('div', { class:'kidhead' }, h('div', null, h('h3', null, 'Team page'), h('p', { class:'muted' }, 'Fill this together. One person types, everyone helps.'))));
   body.append(step(1, 'Session details', coach ? null : 'Only a coach changes these.',
-    h('div', { class:'grid4' }, field(fid(path, 'num'), 'Number', numI), field(fid(path, 'date'), 'Date', date), field(fid(path, 'tmg'), 'Plan', tmg)),
+    h('div', { class:'grid4' }, field(fid(path, 'num'), 'Number', numI), field(fid(path, 'date'), 'Date', date)),
     field(fid(path, 'focus'), 'Today’s focus', lineInput(path, 'focus', 'text', { placeholder:'One line: what is today mainly about?', max:140 })),
     field(fid(path, 'helpers'), 'Helpers today (mentors, visitors, experts)', helpersI),
     enteredLater(s) ? h('p', { class:'hint' }, `This session was added on ${fmtDate(enteredLater(s))}, after it happened. The notebook marks it as written looking back, which is fine: judges prefer an honest catch-up to a blank.`) : null));
@@ -1605,9 +1598,8 @@ function renderTeamTab(body) {
   } finally { RO = wasRO; }
   body.append(step(3, 'What we did as a team', 'A short summary of the whole session.',
     textBox(path, 'teamDid', { rows:4, max:2000, placeholder:'Example: We tested the new drive base on the mat and picked 3 missions to try first. Then we read about animals that glow.' })));
-  body.append(step(4, 'Team reflection', p ? 'Talk about these questions together, then write the team’s answers.' : 'Pick a plan session above to see reflection questions.',
-    p ? h('ul', { class:'qs' }, p.q.map(q => h('li', null, q))) : null,
-    p && p.cv ? h('p', { class:'hint' }, `Theme to talk about in this plan session: ${p.cv}.`) : null,
+  body.append(step(4, 'Team reflection', 'Talk about these together, then write the team’s answers.',
+    h('ul', { class:'qs' }, REFLECT.map(q => h('li', null, q))),
     textBox(path, 'reflection', { rows:4, max:2000, placeholder:'Our answers…' })));
   body.append(step(5, 'Team photos & sketches', 'The field, a test run, a whiteboard, a group shot.', mediaBlock(path, 'team')));
   if (S.role === 'coach') {
@@ -1932,7 +1924,8 @@ function renderTeam(main) {
   main.append(h('section', { class:'ws', id:'sec-who' },
     h('div', { class:'ws-head' }, h('h3', null, 'Who did what'), h('p', { class:'rubric-hint' }, 'Counted from everyone’s entries and the jobs they picked in each session. A zero shows where someone needs a turn.')),
     region('contrib', contribTable, () => JSON.stringify(contributions())),
-    S.role === 'coach' ? h('div', null, h('button', { class:'btn', onclick: openTeamSettings }, 'Team settings')) : null));
+    S.role === 'coach' ? h('div', { style:'display:flex;gap:14px;align-items:center;flex-wrap:wrap' }, h('button', { class:'btn', onclick: openTeamSettings }, 'Team settings'),
+      h('span', { class:'hint' }, !S.tasks ? 'Trello: checking…' : !S.tasks.connected ? 'Trello: not connected (script properties TRELLO_KEY, TRELLO_TOKEN, TRELLO_BOARD).' : S.tasks.error ? 'Trello: connected, but it could not be read just now.' : `Trello: connected · ${S.tasks.items.length} task card${S.tasks.items.length === 1 ? '' : 's'} found.`)) : null));
   main.append(h('section', { class:'ws', id:'sec-progress' },
     h('div', { class:'ws-head' }, h('h3', null, 'Team Progress'), h('p', { class:'rubric-hint' }, 'Each team member fills this in three times: at the start, halfway, and just before the event.')),
     h('div', { class:'recs' }, activeKids().map(k => {
@@ -2409,26 +2402,24 @@ function buildPdf(list, opt, images) {
       const kids = sessionKids(s);
       fill(C.accent); doc.rect(L, y, 30, 3, 'F'); y += 11;
       font('bold', 9); col(C.accent);
-      txt(T(`SESSION ${s.num}` + (s.tmg ? `   ·   TEAM MEETING GUIDE SESSION ${s.tmg}` : '')), L, y, { charSpace: 0.6 });
+      txt(T(`SESSION ${s.num}`), L, y, { charSpace: 0.6 });
       font('normal', 9.5); col(C.ink2); txt(T(fmtDate(s.date, true)), L + CW, y, { align:'right' });
       y += 17;
-      const p = s.tmg && PLAN[s.tmg];
-      const title = has(s.focus) ? s.focus : (p ? p.t.join(' · ') : `Session ${s.num}`);
+      const title = has(s.focus) ? s.focus : `Session ${s.num}`;
       font('bold', 20);
       split(title, CW).forEach(ln => { ensure(25); font('bold', 20); col(C.ink); txt(ln, L, y); y += 25; });
       y += 2;
-      if (p && has(s.focus)) para('Plan: ' + p.t.join(' · '), { size:9.5, color:C.ink2, after:2 });
       const here = kids.filter(k => !isAbsent(s, k.id)).map(k => k.name + (s.kids && s.kids[k.id] && RMAP[s.kids[k.id].role] ? ` (${RMAP[s.kids[k.id].role].label})` : ''));
       const away = kids.filter(k => isAbsent(s, k.id)).map(k => k.name);
       para('Present: ' + (here.join(', ') || '-') + (away.length ? '      Absent: ' + away.join(', ') : ''), { size:9.5, color:C.ink2, after: has(s.helpers) || enteredLater(s) ? 2 : 10 });
       if (has(s.helpers)) para('Helpers: ' + s.helpers, { size:9.5, color:C.ink2, after: enteredLater(s) ? 2 : 10 });
       if (enteredLater(s)) para(`Written on ${fmtDate(enteredLater(s))}, looking back.`, { size:9, style:'italic', color:C.ink2, after:10 });
       hr(); y += 4;
-      const tk = kids.filter(k => { const kk = (s.kids && s.kids[k.id]) || {}; return !isAbsent(s, k.id) && (kk.hw || has(kk.hwNote)); });
+      const tk = kids.filter(k => { const kk = (s.kids && s.kids[k.id]) || {}; return !isAbsent(s, k.id) && (kk.hw || has(kk.hwNote) || has(kk.tasks)); });
       if (tk.length) {
         sec('Tasks since last time (assigned in Trello)');
-        table([{ label:'Name', w:0.16, bold:true }, { label:'Status', w:0.16, bold:true }, { label:'What they did', w:0.68 }],
-          tk.map(k => { const kk = s.kids[k.id]; return [k.name, { text: HWL[kk.hw] || 'Not checked', color: ({ done:C.ok, partly:C.mid, not:C.bad }[kk.hw] || C.ink3) }, kk.hwNote || '']; }), { size:9.5 });
+        table([{ label:'Name', w:0.14, bold:true }, { label:'Tasks', w:0.38 }, { label:'Status', w:0.14, bold:true }, { label:'What they did', w:0.34 }],
+          tk.map(k => { const kk = s.kids[k.id]; return [k.name, kk.tasks || '-', { text: HWL[kk.hw] || 'Not checked', color: ({ done:C.ok, partly:C.mid, not:C.bad }[kk.hw] || C.ink3) }, kk.hwNote || '']; }), { size:9 });
       }
       const didKids = kids.filter(k => !isAbsent(s, k.id) && has(s.kids && s.kids[k.id] && s.kids[k.id].did));
       if (has(s.teamDid) || didKids.length) {
@@ -2443,7 +2434,7 @@ function buildPdf(list, opt, images) {
       }
       if (has(s.reflection)) {
         sec('Team reflection');
-        if (p) p.q.forEach(q => para('- ' + q, { size:9, style:'italic', color:C.ink2, after:1 }));
+        REFLECT.forEach(q => para('- ' + q, { size:9, style:'italic', color:C.ink2, after:1 }));
         y += 5; para(s.reflection, { after:10 });
       }
       const media = opt.photos ? mediaOf(s) : [];
@@ -2506,7 +2497,7 @@ function buildPdf(list, opt, images) {
     if (pageOf.has('ip')) entries.push(['Part 2', 'Innovation Project', pageOf.get('ip')]);
     if (pageOf.has('rd')) entries.push(['Part 3', 'Robot Design', pageOf.get('rd')]);
     if (pageOf.has('sessions')) { entries.push(['Part 4', 'Session log', pageOf.get('sessions')]);
-      list.forEach(s => { const p = s.tmg && PLAN[s.tmg]; entries.push(['', `Session ${s.num} · ${fmtDate(s.date)} · ${has(s.focus) ? s.focus : (p ? p.t.join(' · ') : '')}`, pageOf.get('s:' + s.id)]); }); }
+      list.forEach(s => { entries.push(['', `Session ${s.num} · ${fmtDate(s.date)}${has(s.focus) ? ' · ' + s.focus : ''}`, pageOf.get('s:' + s.id)]); }); }
     if (pageOf.has('cv')) entries.push(['Part 5', 'Core Values', pageOf.get('cv')]);
     if (pageOf.has('index')) entries.push(['', 'Evidence index', pageOf.get('index')]);
     const stepH = Math.max(11, Math.min(20, (H - BOT - 20 - y) / Math.max(1, entries.length)));
