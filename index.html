@@ -421,7 +421,7 @@ const HW = [
   { k:'done',   label:'Done',        cls:'ok'  },
   { k:'partly', label:'Partly done', cls:'mid' },
   { k:'not',    label:'Not yet',     cls:'bad' },
-  { k:'none',   label:'No homework', cls:'na'  },
+  { k:'none',   label:'No tasks',    cls:'na'  },
 ];
 const HWL = Object.fromEntries(HW.map(o => [o.k, o.label]));
 const AREAS = [ { k:'robot', label:'Robot & robot game' }, { k:'project', label:'Innovation project' } ];
@@ -1306,10 +1306,9 @@ function isAbsent(s, id) { return !!(s && s.present && s.present[id] === false);
 function kidProgress(s, kid, prev) {
   const k = (s.kids && s.kids[kid.id]) || {};
   const parts = [];
-  if (prev) parts.push(!!k.hw);
+  parts.push(!!k.hw);                                   // tasks since last time (assigned in Trello)
   parts.push(has(k.did));
   parts.push((k.values || []).length > 0 && has(k.learned));
-  parts.push(has(s.hwNext && s.hwNext[kid.id]));
   return { done: parts.filter(Boolean).length, total: parts.length };
 }
 function mediaOf(d) {
@@ -1336,7 +1335,7 @@ function renderHome(main) {
       !today && S.role !== 'coach' ? h('p', { class:'hint' }, 'Your coach starts today’s session. Then your page shows up here.') : null),
     h('ol', { class:'howto', 'aria-label':'How a session works' },
       h('li', null, h('span', null, h('b', null, 'Start of the meeting: '), 'the coach starts the session and picks the plan.')),
-      h('li', null, h('span', null, h('b', null, 'Last 15 minutes: '), 'everyone opens their own page and fills in 5 short steps.')),
+      h('li', null, h('span', null, h('b', null, 'Last 15 minutes: '), 'everyone opens their own page and fills in 4 short steps.')),
       h('li', null, h('span', null, h('b', null, 'During the week: '), 'add research, tests, attachments and feedback in Project and Robot.')))));
   if (l.length) {
     main.append(h('section', { 'aria-labelledby':'lh' },
@@ -1482,16 +1481,11 @@ function renderKidTabInner(body, kid) {
   body.append(h('div', { class:'rolebar' }, h('span', { class:'lbl' }, 'My job today'),
     chipsInput(path, base + '.role', ROLES.map(r => ({ k:r.k, label:r.label })), true)));
 
-  const hwGiven = prev ? h('div', { class:'given' },
-      h('span', { class:'lab mono' }, `Your homework from Session ${prev.num}`),
-      has(prev.hwNext && prev.hwNext[kid.id]) ? h('span', { class:'txt' }, prev.hwNext[kid.id]) : h('span', { class:'none' }, 'No homework was written down for you.'),
-      has(prev.hwNext && prev.hwNext.team) ? [h('span', { class:'lab mono', style:'margin-top:6px' }, 'Team homework'), h('span', { class:'txt' }, prev.hwNext.team)] : null)
-    : h('p', { class:'hint' }, 'This is the first session in the logbook, so there is no homework to check yet.');
-  body.append(step(1, 'Homework check', prev ? 'Did you finish it?' : null, hwGiven,
-    prev ? region('choices', () => HW.map(o => h('button', { class:'choice ' + o.cls, type:'button', 'data-key':'hw-' + o.k, 'aria-pressed': String((getPath(view(path), base + '.hw') || '') === o.k), disabled: !canWrite(),
+  body.append(step(1, 'My tasks since last time', 'Your tasks are in Trello. Did you finish them?',
+    region('choices', () => HW.map(o => h('button', { class:'choice ' + o.cls, type:'button', 'data-key':'hw-' + o.k, 'aria-pressed': String((getPath(view(path), base + '.hw') || '') === o.k), disabled: !canWrite(),
       onclick: () => { const cur = getPath(view(path), base + '.hw') || ''; edit(path, base + '.hw', cur === o.k ? '' : o.k); refresh(); } }, o.label)),
-      () => String(getPath(view(path), base + '.hw') || '')) : null,
-    prev ? textBox(path, base + '.hwNote', { small:true, rows:2, max:400, placeholder:'What did you do or bring? (optional)' }) : null));
+      () => String(getPath(view(path), base + '.hw') || '')),
+    textBox(path, base + '.hwNote', { small:true, rows:2, max:400, placeholder:'What did you do or bring? One line. (optional)' })));
 
   body.append(step(2, 'What I did today', 'Build, program, test, research, draw… What happened?',
     chipsInput(path, base + '.areas', AREAS.map(a => ({ k:a.k, label:a.label }))),
@@ -1510,8 +1504,6 @@ function renderKidTabInner(body, kid) {
     textBox(path, base + '.learned', { rows:4, placeholder:'What did you learn? How did you show this Core Value?' })));
 
   body.append(step(4, 'My photos & sketches', 'Take a photo of what you built, or of a sketch you drew on paper. Write one line about each.', mediaBlock(path, kid.id)));
-  body.append(step(5, 'My homework for next time', 'What will you do before the next session? Ask your team if you are not sure.',
-    textBox(path, 'hwNext.' + kid.id, { small:true, rows:2, max:400, placeholder:'Example: Draw the new arm with measurements.' })));
   body.append(exampleBox());
   const l = sessionKids(s).filter(k => !isAbsent(s, k.id));
   const i = l.findIndex(k => k.id === kid.id); const nxt = l[i + 1];
@@ -1523,11 +1515,10 @@ function renderKidTabInner(body, kid) {
 function exampleBox() {
   return h('details', { class:'example' }, h('summary', null, 'See a good example (made-up teammate “Alex”)'),
     h('dl', null,
-      h('dt', null, 'Homework'), h('dd', null, 'Done. “I built Model 05 at home and took a photo holding it.”'),
+      h('dt', null, 'My tasks'), h('dd', null, 'Done. “I built Model 05 at home and took a photo holding it.”'),
       h('dt', null, 'What I did'), h('dd', null, '“I built a pusher arm for the Forest Elder mission. We tested it 5 times and it worked 3 times. The arm was too short, so I added a longer beam.”'),
       h('dt', null, 'Core Values'), h('dd', null, 'Innovation, Teamwork. “When the arm did not work, we changed one thing at a time and did not give up. My teammate held the robot while I measured.”'),
-      h('dt', null, 'Photo'), h('dd', null, 'The arm before and after the change, with a caption for each.'),
-      h('dt', null, 'My homework'), h('dd', null, '“Draw the new arm with measurements.”')));
+      h('dt', null, 'Photo'), h('dd', null, 'The arm before and after the change, with a caption for each.')));
 }
 function renderTeamTab(body) {
   const path = SP(S.openId); const s = view(path);
@@ -1578,8 +1569,6 @@ function renderTeamTab(body) {
     p && p.cv ? h('p', { class:'hint' }, `Theme to talk about in this plan session: ${p.cv}.`) : null,
     textBox(path, 'reflection', { rows:4, max:2000, placeholder:'Our answers…' })));
   body.append(step(5, 'Team photos & sketches', 'The field, a test run, a whiteboard, a group shot.', mediaBlock(path, 'team')));
-  body.append(step(6, 'Team homework for next time', 'Everyone writes their own homework on their page. Put shared homework here.',
-    textBox(path, 'hwNext.team', { small:true, rows:2, max:400, placeholder:'Example: Everyone brings one fact about a glowing animal or fungus.' })));
   if (S.role === 'coach') {
     body.append(step(7, 'For coaches: judging evidence', 'Tag what this session shows. The PDF builds an evidence index from these tags.',
       h('div', { class:'ev' }, EV_AREAS.map(a => h('div', { class:'row' }, h('b', null, a.label),
@@ -2394,13 +2383,11 @@ function buildPdf(list, opt, images) {
       if (has(s.helpers)) para('Helpers: ' + s.helpers, { size:9.5, color:C.ink2, after: enteredLater(s) ? 2 : 10 });
       if (enteredLater(s)) para(`Written on ${fmtDate(enteredLater(s))}, looking back.`, { size:9, style:'italic', color:C.ink2, after:10 });
       hr(); y += 4;
-      sec('Homework check');
-      if (!prev) para('This is the first session in the notebook, so there was no homework to check.', { color:C.ink2, size:10 });
-      else {
-        const rows = kids.map(k => { const kk = (s.kids && s.kids[k.id]) || {}; const ab = isAbsent(s, k.id);
-          return [k.name, (prev.hwNext && prev.hwNext[k.id]) || '-', { text: ab ? 'Absent' : (HWL[kk.hw] || 'Not checked'), color: ab ? C.ink3 : ({ done:C.ok, partly:C.mid, not:C.bad }[kk.hw] || C.ink3) }, ab ? '' : (kk.hwNote || '')]; });
-        if (has(prev.hwNext && prev.hwNext.team)) rows.push(['Team', prev.hwNext.team, '', '']);
-        table([{ label:'Name', w:0.16, bold:true }, { label:`Homework from Session ${prev.num}`, w:0.38 }, { label:'Status', w:0.15, bold:true }, { label:'What they did', w:0.31 }], rows, { size:9.5 });
+      const tk = kids.filter(k => { const kk = (s.kids && s.kids[k.id]) || {}; return !isAbsent(s, k.id) && (kk.hw || has(kk.hwNote)); });
+      if (tk.length) {
+        sec('Tasks since last time (assigned in Trello)');
+        table([{ label:'Name', w:0.16, bold:true }, { label:'Status', w:0.16, bold:true }, { label:'What they did', w:0.68 }],
+          tk.map(k => { const kk = s.kids[k.id]; return [k.name, { text: HWL[kk.hw] || 'Not checked', color: ({ done:C.ok, partly:C.mid, not:C.bad }[kk.hw] || C.ink3) }, kk.hwNote || '']; }), { size:9.5 });
       }
       const didKids = kids.filter(k => !isAbsent(s, k.id) && has(s.kids && s.kids[k.id] && s.kids[k.id].did));
       if (has(s.teamDid) || didKids.length) {
@@ -2425,10 +2412,6 @@ function buildPdf(list, opt, images) {
         sec('Photos and sketches');
         drawPhotos(rowsP);
       }
-      const hn = s.hwNext || {};
-      const hrows = kids.filter(k => has(hn[k.id])).map(k => [k.name, hn[k.id]]);
-      if (has(hn.team)) hrows.unshift(['Team', hn.team]);
-      if (hrows.length) { sec('Homework for next time'); table([{ label:'Name', w:0.16, bold:true }, { label:'Homework', w:0.84 }], hrows, { size:10 }); }
       const ev = s.evidence || [];
       if (ev.length) {
         const pr = EV_AREAS.map(a => { const st = EV_STEPS.filter(x => ev.includes(`${a.k}:${x}`)); return st.length ? `${a.label}: ${st.join(', ')}` : ''; }).filter(Boolean);
