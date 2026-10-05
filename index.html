@@ -284,6 +284,11 @@ body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .navtab[aria-current="page"]{color:var(--night-ink);border-bottom-color:var(--glow)}
 .lock{max-width:460px;margin-inline:auto}
 .lock input{font-size:1.2rem;letter-spacing:.04em}
+.lock{max-width:560px;display:grid;gap:14px}
+.lock .whogrid{grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
+.lock .coachform{display:grid;gap:10px}
+.lock .coachform[hidden]{display:none}
+.lock .status:empty{display:none}
 .whogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
 .whobtn{appearance:none;font:inherit;font-weight:700;font-size:1.05rem;display:grid;justify-items:center;gap:8px;padding:16px 10px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .whobtn:hover{border-color:var(--kid,var(--accent))}
@@ -340,6 +345,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .mload{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:.82rem}
 .mimg img[hidden]{display:none}
 .panel .hint{margin:0}
+.planline.later{font-style:italic;color:var(--ink-3,var(--ink-2))}
 @media print{.top,.nav{position:static}}
 
 @media (pointer:coarse){input,select,textarea{font-size:16px}}
@@ -657,6 +663,13 @@ function fmtDate(s, long) {
   const d = parseDate(s); if (!d) return 'No date';
   return d.toLocaleDateString('en-US', long ? { weekday:'long', month:'long', day:'numeric', year:'numeric' } : { weekday:'short', month:'short', day:'numeric' });
 }
+function dateStrOf(ms) { const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+// A session created 2+ days after its date was written looking back (catch-up entry). Returns that entry date, else null.
+function enteredLater(s) {
+  const d = parseDate(s && s.date); if (!d || !s.createdAt) return null;
+  const made = parseDate(dateStrOf(s.createdAt));
+  return made && (made - d) >= 2 * 86400000 ? dateStrOf(s.createdAt) : null;
+}
 const words = s => ((s || '').trim().match(/\S+/g) || []).length;
 const has = s => !!(s && String(s).trim());
 const num = v => { const n = Number(v); return isFinite(n) ? n : 0; };
@@ -713,7 +726,7 @@ function authFailed(e) {
   }
   if (e && e.code === 'bad_code') {
     S.pin = ''; ['mb.pin', 'mb.role', 'mb.me'].forEach(k => LS.del(k)); S.role = null; S.me = '';
-    toast('Your code no longer works. Ask your coach for your code.', 7000);
+    toast('This device was signed out. Tap your name to sign in again.', 7000);
     render(); return true;
   }
   return false;
@@ -1010,14 +1023,15 @@ function panel(title, text, ...extra) {
 function field(id, label, input, wide) { return h('div', { class:'field' + (wide ? ' wide' : '') }, h('label', { for:id }, label), input); }
 
 /* ---------- Team code and device owner ---------- */
+// Sign-in screen. Kids tap their name (the script accepts the id as their code); coaches type the coach code.
 function lockCard() {
-  const inp = h('input', { type:'text', id:'code', autocomplete:'off', autocapitalize:'off', spellcheck:'false', placeholder:'Your code' });
   const st = h('p', { class:'status', role:'status' });
-  const btn = h('button', { class:'btn primary', type:'submit' }, 'Open the logbook');
-  const form = h('form', { class:'panel lock', onsubmit: async e => {
-    e.preventDefault();
-    const code = inp.value.trim(); if (!code) return;
-    btn.disabled = true; st.className = 'status'; st.textContent = 'Checking…';
+  const signInMsg = err => err.code === 'bad_code' ? 'That did not work. Ask your coach.' : err.code === 'locked' ? 'Too many wrong tries. Wait 15 minutes.' : err.code === 'not_set_up' ? 'The logbook is not set up yet. Ask your coach.' : 'Could not reach the logbook. Check the Wi-Fi and try again.';
+  let busy = false;
+  async function signIn(code, label) {
+    if (busy) return; busy = true;
+    st.className = 'status'; st.textContent = label || 'Checking…';
+    card.querySelectorAll('button').forEach(b => { b.disabled = true; });
     try {
       await api('ping', {}, code);
       S.pin = code; LS.set('mb.pin', code);
@@ -1025,16 +1039,35 @@ function lockCard() {
       await sync(true);
       render();
     } catch (err) {
-      st.className = 'status err';
-      st.textContent = err.code === 'bad_code' ? 'That code is not right. Check it with your coach.' : err.code === 'locked' ? 'Too many wrong codes. Wait 15 minutes.' : err.code === 'not_set_up' ? 'The logbook is not set up yet. Ask your coach.' : 'Could not reach the logbook. Check the Wi-Fi and try again.';
-      btn.disabled = false;
+      st.className = 'status err'; st.textContent = signInMsg(err);
+      card.querySelectorAll('button').forEach(b => { b.disabled = false; });
+      busy = false;
     }
-  } },
+  }
+  const names = h('div', { class:'whogrid', id:'names' }, h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'Loading names…'));
+  const inp = h('input', { type:'text', id:'code', autocomplete:'off', autocapitalize:'off', spellcheck:'false', placeholder:'Coach code' });
+  const btn = h('button', { class:'btn primary', type:'submit' }, 'Open the logbook');
+  const coachForm = h('form', { class:'coachform', hidden:true, onsubmit: e => { e.preventDefault(); const code = inp.value.trim(); if (code) signIn(code); } },
+    field('code', 'Coach code', inp), h('div', null, btn));
+  const coachLink = h('button', { class:'linkbtn', type:'button', id:'iamcoach', onclick: () => { coachForm.hidden = !coachForm.hidden; if (!coachForm.hidden) setTimeout(() => inp.focus(), 30); } }, 'I am a coach');
+  const card = h('div', { class:'panel lock' },
     h('h3', null, 'Welcome to the team logbook'),
-    h('p', { class:'muted' }, 'Type your own code from your coach. You only need to do this once on this device. Keep your code secret.'),
-    field('code', 'Your code', inp), h('div', null, btn), st);
-  setTimeout(() => inp.focus(), 30);
-  return form;
+    h('p', { class:'muted' }, 'Tap your name. You only need to do this once on this device.'),
+    names, st, h('div', null, coachLink), coachForm);
+  (async () => {
+    try {
+      const r = await api('roster', {}, '');
+      const kids = (r && r.kids) || [];
+      names.replaceChildren(...(kids.length ? kids.map((k, i) => h('button', { class:'whobtn', type:'button', 'data-kid': k.id, style:`--kid:${KID_COLORS[i % KID_COLORS.length]}`, onclick: () => signIn(k.id, `Opening ${k.name}’s page…`) },
+        h('span', { class:'av lg', style:`--kid:${KID_COLORS[i % KID_COLORS.length]}`, 'aria-hidden':'true' }, kidShort(k.name)), h('span', null, k.name))) : [h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'No names yet. Ask your coach.')]));
+      if (r && r.error === 'not_set_up') { st.className = 'status err'; st.textContent = signInMsg({ code:'not_set_up' }); }
+    } catch (err) {
+      names.replaceChildren(h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'Could not load the names.'));
+      st.className = 'status err'; st.textContent = signInMsg(err);
+      names.append(h('div', { style:'grid-column:1/-1' }, h('button', { class:'btn', type:'button', onclick: () => render() }, 'Try again')));
+    }
+  })();
+  return card;
 }
 function whoButtons(onPick) {
   return h('div', { class:'whogrid' },
@@ -1349,11 +1382,12 @@ function openNewSession() {
   const tmg = h('select', { id:'ns-tmg' }, h('option', { value:'0' }, 'Not in the plan'), Object.keys(PLAN).map(k => h('option', { value:k }, `Session ${k}: ${PLAN[k].t.join(' · ')}`)));
   tmg.value = String(nextPlan(l));
   const focus = h('input', { type:'text', id:'ns-focus', maxlength:'140', placeholder:'Example: Test the drive base and pick our first 3 missions' });
+  const helpers = h('input', { type:'text', id:'ns-helpers', maxlength:'200', placeholder:'Example: Mentors from FLL Team 35702' });
   const go1 = h('button', { class:'btn primary', onclick: () => {
     const id = newId();
     const present = {};
     activeKids().forEach(k => { present[k.id] = true; });
-    queuePatch(SP(id), { num: num(numI.value) || n, date: date.value || todayStr(), tmg: num(tmg.value), focus: focus.value.trim(), teamDid:'', reflection:'', present, media:{}, createdAt: Date.now() });
+    queuePatch(SP(id), { num: num(numI.value) || n, date: date.value || todayStr(), tmg: num(tmg.value), focus: focus.value.trim(), helpers: helpers.value.trim(), teamDid:'', reflection:'', present, media:{}, createdAt: Date.now() });
     close(); flush();
     const me = meKid(); openSession(id, me ? me.id : 'team');
   } }, 'Create session');
@@ -1361,6 +1395,8 @@ function openNewSession() {
     h('div', { class:'grid2' }, field('ns-num', 'Session number', numI), field('ns-date', 'Date', date)),
     field('ns-tmg', 'Follows the Team Meeting Guide plan', tmg),
     field('ns-focus', 'Today’s focus (optional)', focus),
+    field('ns-helpers', 'Helpers today (optional): mentors, visitors, experts', helpers),
+    h('p', { class:'hint' }, 'Catching up on a past meeting? Set its real date. The notebook then marks the session as written looking back.'),
     h('div', { class:'dfoot' }, go1)]);
 }
 function openSession(id, tab) {
@@ -1380,7 +1416,9 @@ function renderSession(main) {
     h('div', null,
       h('div', { class:'eyebrow mono', id:'sdate' }, fmtDate(s.date, true)),
       h('h2', { class:'stitle', id:'snum' }, `Session ${s.num ?? ''}`),
-      p ? h('p', { class:'planline' }, `Plan: Team Meeting Guide Session ${s.tmg} · ${p.t.join(' · ')}`) : null),
+      p ? h('p', { class:'planline' }, `Plan: Team Meeting Guide Session ${s.tmg} · ${p.t.join(' · ')}`) : null,
+      has(s.helpers) ? h('p', { class:'planline', id:'shelpers' }, `Helpers: ${s.helpers}`) : null,
+      enteredLater(s) ? h('p', { class:'planline later' }, `Written on ${fmtDate(enteredLater(s))}, looking back.`) : null),
     h('button', { class:'btn', onclick: () => go('home') }, '← All sessions')));
   const kidsIn = sessionKids(s);
   if (S.tab !== 'team' && !kidsIn.some(k => k.id === S.tab)) S.tab = 'team';
@@ -1507,7 +1545,9 @@ function renderTeamTab(body) {
   body.append(h('div', { class:'kidhead' }, h('div', null, h('h3', null, 'Team page'), h('p', { class:'muted' }, 'Fill this together. One person types, everyone helps.'))));
   body.append(step(1, 'Session details', coach ? null : 'Only a coach changes these.',
     h('div', { class:'grid4' }, field(fid(path, 'num'), 'Number', numI), field(fid(path, 'date'), 'Date', date), field(fid(path, 'tmg'), 'Plan', tmg)),
-    field(fid(path, 'focus'), 'Today’s focus', lineInput(path, 'focus', 'text', { placeholder:'One line: what is today mainly about?', max:140 }))));
+    field(fid(path, 'focus'), 'Today’s focus', lineInput(path, 'focus', 'text', { placeholder:'One line: what is today mainly about?', max:140 })),
+    field(fid(path, 'helpers'), 'Helpers today (mentors, visitors, experts)', lineInput(path, 'helpers', 'text', { placeholder:'Example: Mentors from FLL Team 35702 taught us Pybricks', max:200 })),
+    enteredLater(s) ? h('p', { class:'hint' }, `This session was added on ${fmtDate(enteredLater(s))}, after it happened. The notebook marks it as written looking back, which is fine: judges prefer an honest catch-up to a blank.`) : null));
   body.append(step(2, 'Who is here today', coach ? 'Tap a name to mark someone absent.' : 'Only a coach changes who is here.',
     region('toggles', () => {
       const d = view(path); const inS = sessionKids(d);
@@ -2342,7 +2382,9 @@ function buildPdf(list, opt, images) {
       if (p && has(s.focus)) para('Plan: ' + p.t.join(' · '), { size:9.5, color:C.ink2, after:2 });
       const here = kids.filter(k => !isAbsent(s, k.id)).map(k => k.name + (s.kids && s.kids[k.id] && RMAP[s.kids[k.id].role] ? ` (${RMAP[s.kids[k.id].role].label})` : ''));
       const away = kids.filter(k => isAbsent(s, k.id)).map(k => k.name);
-      para('Present: ' + (here.join(', ') || '-') + (away.length ? '      Absent: ' + away.join(', ') : ''), { size:9.5, color:C.ink2, after:10 });
+      para('Present: ' + (here.join(', ') || '-') + (away.length ? '      Absent: ' + away.join(', ') : ''), { size:9.5, color:C.ink2, after: has(s.helpers) || enteredLater(s) ? 2 : 10 });
+      if (has(s.helpers)) para('Helpers: ' + s.helpers, { size:9.5, color:C.ink2, after: enteredLater(s) ? 2 : 10 });
+      if (enteredLater(s)) para(`Written on ${fmtDate(enteredLater(s))}, looking back.`, { size:9, style:'italic', color:C.ink2, after:10 });
       hr(); y += 4;
       sec('Homework check');
       if (!prev) para('This is the first session in the notebook, so there was no homework to check.', { color:C.ink2, size:10 });
