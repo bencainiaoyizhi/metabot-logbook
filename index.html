@@ -915,17 +915,19 @@ async function loadTasks(force) {
   catch (e) { if (!S.tasks) S.tasks = { connected: false, error: 'network', items: [] }; }
   finally { S.tasksLoading = false; }
 }
-// The Trello card that was due for this session: the kid's latest card due on or before the session date (up to 3 days after it counts too).
+// The Trello card that was due for this session: the kid's latest card due in the window [session date - 6 days, session date + 3 days] (one week of cards).
 function taskCardFor(kidId, s) {
   if (!S.tasks || !S.tasks.connected || !s || !s.date) return null;
-  const limit = dateStrOf(parseDate(s.date).getTime() + 3 * 86400000);
-  const mine = S.tasks.items.filter(t => t.kid === kidId && t.due && t.due <= limit).sort((a, b) => a.due.localeCompare(b.due));
+  const d = parseDate(s.date); if (!d) return null;
+  const lo = dateStrOf(d.getTime() - 6 * 86400000), hi = dateStrOf(d.getTime() + 3 * 86400000);
+  const mine = S.tasks.items.filter(t => t.kid === kidId && t.due && t.due >= lo && t.due <= hi).sort((a, b) => a.due.localeCompare(b.due) || String(a.list).localeCompare(String(b.list)));
   return mine.length ? mine[mine.length - 1] : null;
 }
-// Card text as a plain list for the notebook: "Week 2 (due Sat, Oct 3): Do research; Review scoring rules"
+// Card description as separate task lines: bullets, numbers and checkboxes stripped.
+function taskLines(text) { return String(text || '').split(/\r?\n/).map(l => l.replace(/^\s*(?:[-*•]|\d+[.)])?\s*(?:\[[ xX]\]\s*)?/, '').trim()).filter(Boolean); }
+// Card text as one line for the notebook: "Week 2 (due Sat, Oct 3): Do research; Review scoring rules"
 function taskText(card) {
-  const lines = String(card.text || '').split('\n').map(l => l.replace(/^\s*[-*•]\s*/, '').trim()).filter(Boolean);
-  return `${card.list ? card.list + ' ' : ''}(due ${fmtDate(card.due)}): ${lines.join('; ')}`.trim();
+  return `${card.list ? card.list + ' ' : ''}(due ${fmtDate(card.due)}): ${taskLines(card.text).join('; ')}`.trim();
 }
 function paintNet() {
   const n = $('#netdot'); if (!n) return;
@@ -1432,7 +1434,7 @@ function openSession(id, tab) {
   const me = meKid();
   S.tab = tab || (me && sessionKids(s).some(k => k.id === me.id) ? me.id : 'team');
   render(); window.scrollTo(0, 0);
-  loadTasks();
+  loadTasks(Date.now() - S.tasksAt > 60000);                               // opening a session re-reads Trello if the copy is over a minute old
 }
 function renderSession(main) {
   const path = SP(S.openId); const s = view(path);
@@ -1506,23 +1508,28 @@ function renderKidTabInner(body, kid) {
   body.append(h('div', { class:'rolebar' }, h('span', { class:'lbl' }, 'My job today'),
     chipsInput(path, base + '.role', ROLES.map(r => ({ k:r.k, label:r.label })), true)));
 
-  const card = taskCardFor(kid.id, s);
-  const saved = getPath(view(path), base + '.tasks');                      // the card text as it was when the status was set (what the PDF prints)
-  const taskBlock = card
-    ? h('div', { class:'given tasks' },
-        h('span', { class:'lab mono' }, `Your tasks from Trello · ${card.list || 'card'} · due ${fmtDate(card.due)}${card.done || card.labels.includes('done') ? ' · marked done in Trello' : ''}`),
-        h('ul', { class:'tasklist' }, String(card.text || '').split('\n').map(l => l.replace(/^\s*[-*•]\s*/, '').trim()).filter(Boolean).map(l => h('li', null, l))),
-        card.url ? h('a', { class:'small', href: card.url, target:'_blank', rel:'noopener' }, 'Open in Trello') : null)
-    : has(saved) ? h('div', { class:'given tasks' }, h('span', { class:'lab mono' }, 'Your tasks (from Trello)'), h('span', { class:'txt' }, saved))
-    : S.tasks && S.tasks.connected && !S.tasks.error ? h('p', { class:'hint' }, 'No Trello card was due for you before this session.')
-    : S.tasks && S.tasks.error ? h('p', { class:'hint' }, 'Trello could not be read right now. Your tasks are still in Trello.')
-    : null;
-  body.append(step(1, 'My tasks since last time', 'Your tasks are in Trello. Did you finish them?', taskBlock,
-    region('choices', () => HW.map(o => h('button', { class:'choice ' + o.cls, type:'button', 'data-key':'hw-' + o.k, 'aria-pressed': String((getPath(view(path), base + '.hw') || '') === o.k), disabled: !canWrite(),
-      onclick: () => { const cur = getPath(view(path), base + '.hw') || ''; edit(path, base + '.hw', cur === o.k ? '' : o.k);
-        const c = taskCardFor(kid.id, view(path)); if (c) edit(path, base + '.tasks', taskText(c));   // keep a copy of the tasks with the answer
-        refresh(); } }, o.label)),
-      () => String(getPath(view(path), base + '.hw') || '')),
+  // The Trello card and the status buttons live in one region, so they redraw when the cards arrive (they load after the page) or the answer changes.
+  const taskRegion = region('tasks', () => {
+    const card = taskCardFor(kid.id, view(path));
+    const saved = getPath(view(path), base + '.tasks');                    // the card text as it was when the status was set (what the PDF prints)
+    const block = card
+      ? h('div', { class:'given tasks' },
+          h('span', { class:'lab mono' }, `Your tasks from Trello · ${card.list || 'card'} · due ${fmtDate(card.due)}${card.done || card.labels.includes('done') ? ' · marked done in Trello' : ''}`),
+          h('ul', { class:'tasklist' }, taskLines(card.text).map(l => h('li', null, l))),
+          card.url ? h('a', { class:'small', href: card.url, target:'_blank', rel:'noopener' }, 'Open in Trello') : null)
+      : has(saved) ? h('div', { class:'given tasks' }, h('span', { class:'lab mono' }, 'Your tasks (from Trello)'), h('span', { class:'txt' }, saved))
+      : S.tasks && S.tasks.error ? h('p', { class:'hint' }, 'Trello could not be read right now. Your tasks are still in Trello.')
+      : S.tasks && S.tasks.connected ? h('p', { class:'hint' }, 'No Trello card was due for you before this session.')
+      : null;
+    const cur = getPath(view(path), base + '.hw') || '';
+    const choices = h('div', { class:'choices' }, HW.map(o => h('button', { class:'choice ' + o.cls, type:'button', 'data-key':'hw-' + o.k, 'aria-pressed': String(cur === o.k), disabled: !canWrite(),
+      onclick: () => { const was = getPath(view(path), base + '.hw') || ''; const next = was === o.k ? '' : o.k; edit(path, base + '.hw', next);
+        const c = taskCardFor(kid.id, view(path));
+        edit(path, base + '.tasks', next && c ? taskText(c) : (next ? getPath(view(path), base + '.tasks') || null : null));   // keep a copy of the tasks with the answer; clearing the answer clears the copy
+        refresh(); } }, o.label)));
+    return [block, choices];
+  }, () => JSON.stringify([S.tasksAt, !!(S.tasks && S.tasks.error), (() => { const c = taskCardFor(kid.id, view(path)); return c ? [c.url, c.due, c.done, c.labels, c.text] : null; })(), getPath(view(path), base + '.hw') || '', getPath(view(path), base + '.tasks') || '']));
+  body.append(step(1, 'My tasks since last time', 'Your tasks are in Trello. Did you finish them?', taskRegion,
     textBox(path, base + '.hwNote', { small:true, rows:2, max:400, placeholder:'What did you do or bring? One line. (optional)' })));
 
   body.append(step(2, 'What I did today', 'Build, program, test, research, draw… What happened?',
@@ -1603,7 +1610,7 @@ function renderTeamTab(body) {
     textBox(path, 'reflection', { rows:4, max:2000, placeholder:'Our answers…' })));
   body.append(step(5, 'Team photos & sketches', 'The field, a test run, a whiteboard, a group shot.', mediaBlock(path, 'team')));
   if (S.role === 'coach') {
-    body.append(step(7, 'For coaches: judging evidence', 'Tag what this session shows. The PDF builds an evidence index from these tags.',
+    body.append(step(6, 'For coaches: judging evidence', 'Tag what this session shows. The PDF builds an evidence index from these tags.',
       h('div', { class:'ev' }, EV_AREAS.map(a => h('div', { class:'row' }, h('b', null, a.label),
         chipsInput(path, 'evidence', EV_STEPS.map(st => ({ k:`${a.k}:${st}`, label:st }))))))));
     body.append(sessionDeleteZone(path, s));
@@ -1925,7 +1932,7 @@ function renderTeam(main) {
     h('div', { class:'ws-head' }, h('h3', null, 'Who did what'), h('p', { class:'rubric-hint' }, 'Counted from everyone’s entries and the jobs they picked in each session. A zero shows where someone needs a turn.')),
     region('contrib', contribTable, () => JSON.stringify(contributions())),
     S.role === 'coach' ? h('div', { style:'display:flex;gap:14px;align-items:center;flex-wrap:wrap' }, h('button', { class:'btn', onclick: openTeamSettings }, 'Team settings'),
-      h('span', { class:'hint' }, !S.tasks ? 'Trello: checking…' : !S.tasks.connected ? 'Trello: not connected (script properties TRELLO_KEY, TRELLO_TOKEN, TRELLO_BOARD).' : S.tasks.error ? 'Trello: connected, but it could not be read just now.' : `Trello: connected · ${S.tasks.items.length} task card${S.tasks.items.length === 1 ? '' : 's'} found.`)) : null));
+      h('span', { class:'hint' }, !S.tasks ? 'Trello: checking…' : S.tasks.error === 'network' ? 'Trello: could not check (no connection).' : !S.tasks.connected ? 'Trello: not connected (script properties TRELLO_KEY, TRELLO_TOKEN, TRELLO_BOARD).' : S.tasks.error ? 'Trello: connected, but it could not be read just now.' : `Trello: connected · ${S.tasks.items.length} task card${S.tasks.items.length === 1 ? '' : 's'} found.`)) : null));
   main.append(h('section', { class:'ws', id:'sec-progress' },
     h('div', { class:'ws-head' }, h('h3', null, 'Team Progress'), h('p', { class:'rubric-hint' }, 'Each team member fills this in three times: at the start, halfway, and just before the event.')),
     h('div', { class:'recs' }, activeKids().map(k => {
