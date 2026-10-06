@@ -924,7 +924,8 @@ function taskCardFor(kidId, s) {
   return mine.length ? mine[mine.length - 1] : null;
 }
 // Card description as separate task lines: bullets, numbers and checkboxes stripped.
-function taskLines(text) { return String(text || '').split(/\r?\n/).map(l => l.replace(/^\s*(?:[-*•]|\d+[.)])?\s*(?:\[[ xX]\]\s*)?/, '').trim()).filter(Boolean); }
+// Trello's editor sometimes leaves invisible characters (zero-width joiners, BOM) in a card: they are dropped too.
+function taskLines(text) { return String(text || '').replace(/[\u200B-\u200D\u2060\uFEFF]/g, '').split(/\r?\n/).map(l => l.replace(/^\s*(?:[-*•]|\d+[.)])?\s*(?:\[[ xX]\]\s*)?/, '').trim()).filter(Boolean); }
 // Card text as one line for the notebook: "Week 2 (due Sat, Oct 3): Do research; Review scoring rules"
 function taskText(card) {
   return `${card.list ? card.list + ' ' : ''}(due ${fmtDate(card.due)}): ${taskLines(card.text).join('; ')}`.trim();
