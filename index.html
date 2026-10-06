@@ -924,11 +924,13 @@ function taskCardFor(kidId, s) {
   return mine.length ? mine[mine.length - 1] : null;
 }
 // Card description as separate task lines: bullets, numbers and checkboxes stripped.
-// Trello's editor sometimes leaves invisible characters (zero-width joiners, BOM) in a card: they are dropped too.
-function taskLines(text) { return String(text || '').replace(/[\u200B-\u200D\u2060\uFEFF]/g, '').split(/\r?\n/).map(l => l.replace(/^\s*(?:[-*•]|\d+[.)])?\s*(?:\[[ xX]\]\s*)?/, '').trim()).filter(Boolean); }
+// Trello's editor leaves an invisible character (a zero-width non-joiner) on a card's first line: zero-width characters at the
+// edges of a line are dropped. Inside a line they are kept, because emoji like 👨‍👩‍👧 and some scripts are built from them.
+function taskLines(text) { return String(text || '').split(/\r?\n/).map(l => l.replace(/^[\s\u200B-\u200D\u2060\uFEFF]+|[\s\u200B-\u200D\u2060\uFEFF]+$/g, '').replace(/^(?:[-*•]|\d+[.)])?\s*(?:\[[ xX]\]\s*)?/, '').trim()).filter(Boolean); }
 // Card text as one line for the notebook: "Week 2 (due Sat, Oct 3): Do research; Review scoring rules"
 function taskText(card) {
-  return `${card.list ? card.list + ' ' : ''}(due ${fmtDate(card.due)}): ${taskLines(card.text).join('; ')}`.trim();
+  const lines = taskLines(card.text);
+  return `${card.list ? card.list + ' ' : ''}(due ${fmtDate(card.due)}): ${lines.length ? lines.join('; ') : 'no tasks listed on the card'}`.trim();
 }
 function paintNet() {
   const n = $('#netdot'); if (!n) return;
@@ -1516,7 +1518,7 @@ function renderKidTabInner(body, kid) {
     const block = card
       ? h('div', { class:'given tasks' },
           h('span', { class:'lab mono' }, `Your tasks from Trello · ${card.list || 'card'} · due ${fmtDate(card.due)}${card.done || card.labels.includes('done') ? ' · marked done in Trello' : ''}`),
-          h('ul', { class:'tasklist' }, taskLines(card.text).map(l => h('li', null, l))),
+          taskLines(card.text).length ? h('ul', { class:'tasklist' }, taskLines(card.text).map(l => h('li', null, l))) : h('p', { class:'hint' }, 'The card has no tasks written on it yet.'),
           card.url ? h('a', { class:'small', href: card.url, target:'_blank', rel:'noopener' }, 'Open in Trello') : null)
       : has(saved) ? h('div', { class:'given tasks' }, h('span', { class:'lab mono' }, 'Your tasks (from Trello)'), h('span', { class:'txt' }, saved))
       : S.tasks && S.tasks.error ? h('p', { class:'hint' }, 'Trello could not be read right now. Your tasks are still in Trello.')
