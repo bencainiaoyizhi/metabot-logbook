@@ -317,6 +317,11 @@ body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .lock .coachform{display:grid;gap:10px;width:min(100%,380px)}
 .lock .coachform[hidden]{display:none}
 .lock .coachform input{font-size:1.15rem;letter-spacing:.04em}
+.tile[aria-pressed="true"]{border-color:var(--kid);box-shadow:0 0 0 3px color-mix(in srgb,var(--kid) 30%,transparent)}
+.lock .kidform{--kid:var(--accent);display:grid;gap:10px;width:min(100%,380px);margin-top:16px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--kid);background:var(--surface)}
+.lock .kidform[hidden]{display:none}
+.lock .kidform input{font-size:1.15rem;letter-spacing:.04em}
+.kidform-row{display:flex;gap:10px;flex-wrap:wrap}
 .whogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
 .whobtn{appearance:none;font:inherit;font-weight:700;font-size:1.05rem;display:grid;justify-items:center;gap:8px;padding:16px 10px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .whobtn:hover{border-color:var(--kid,var(--accent))}
@@ -1064,17 +1069,22 @@ function panel(title, text, ...extra) {
 function field(id, label, input, wide) { return h('div', { class:'field' + (wide ? ' wide' : '') }, h('label', { for:id }, label), input); }
 
 /* ---------- Team code and device owner ---------- */
-// Sign-in screen. Kids tap their name (the script accepts the id as their code); coaches type the coach code.
+// Sign-in screen. Kids tap their name and type their code (their first name in lowercase: the script accepts the id as the code);
+// coaches type the coach code.
 function lockCard() {
   const st = h('p', { class:'status', role:'status' });
-  const signInMsg = err => err.code === 'bad_code' ? 'That did not work. Ask your coach.' : err.code === 'locked' ? 'Too many wrong tries. Wait 15 minutes.' : err.code === 'not_set_up' ? 'The logbook is not set up yet. Ask your coach.' : 'Could not reach the logbook. Check the Wi-Fi and try again.';
+  const signInMsg = err => err.code === 'bad_code' ? 'That did not work. Ask your coach.' : err.code === 'wrong_kid' ? `That is not ${err.name}’s code. Ask your coach.` : err.code === 'locked' ? 'Too many wrong tries. Wait 15 minutes.' : err.code === 'not_set_up' ? 'The logbook is not set up yet. Ask your coach.' : 'Could not reach the logbook. Check the Wi-Fi and try again.';
   let busy = false;
-  async function signIn(code, label) {
+  async function signIn(code, label, kid) {
     if (busy) return; busy = true;
     st.className = 'status'; st.textContent = label || 'Checking…';
     card.querySelectorAll('button').forEach(b => { b.disabled = true; });
     try {
-      await api('ping', {}, code);
+      const r = await api('ping', {}, code);
+      if (kid && r.me !== kid.id) {                                        // a valid code, but someone else's: do not open their page
+        S.role = null; S.me = ''; S.who = ''; ['mb.role', 'mb.me', 'mb.who'].forEach(k => LS.del(k));
+        throw { code:'wrong_kid', name: kid.name };
+      }
       S.pin = code; LS.set('mb.pin', code);
       st.textContent = 'Loading…';
       await sync(true);
@@ -1091,12 +1101,26 @@ function lockCard() {
   const btn = h('button', { class:'btn primary', type:'submit' }, 'Open the logbook');
   const coachForm = h('form', { class:'coachform', id:'coachform', hidden:true, onsubmit: e => { e.preventDefault(); const code = inp.value.trim(); if (code) signIn(code); } },
     field('code', 'Coach code', inp), h('div', null, btn));
+  // Kid code: shown under the names after a tap. Lower-cased and trimmed, so an iPad that capitalizes the first letter still works.
+  let pick = null;
+  const kidInp = h('input', { type:'password', id:'kidcode', autocomplete:'off', autocapitalize:'none', spellcheck:'false', placeholder:'Your code' });
+  const kidLabel = h('label', { for:'kidcode' }, 'Your code');
+  const kidForm = h('form', { class:'kidform', id:'kidform', hidden:true, onsubmit: e => { e.preventDefault(); const code = kidInp.value.trim().toLowerCase(); if (pick && code) signIn(code, `Opening ${pick.name}’s page…`, pick); } },
+    h('div', { class:'field' }, kidLabel, kidInp),
+    h('div', { class:'kidform-row' }, h('button', { class:'btn primary', type:'submit' }, 'Open my page'),
+      h('button', { class:'btn', type:'button', onclick: () => pickKid(null) }, 'Not me')));
+  function pickKid(k) {
+    pick = k; kidInp.value = ''; st.className = 'status'; st.textContent = '';
+    names.querySelectorAll('.tile').forEach(t => t.setAttribute('aria-pressed', String(!!k && t.dataset.kid === k.id)));
+    kidForm.hidden = !k;
+    if (k) { kidLabel.textContent = `${k.name}, type your code`; kidForm.style.setProperty('--kid', k.color); setTimeout(() => kidInp.focus(), 30); }
+  }
   const keyIcon = () => { const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); el.setAttribute('viewBox', '0 0 24 24'); el.setAttribute('aria-hidden', 'true'); el.innerHTML = '<path fill="currentColor" d="M14.5 3a6.5 6.5 0 0 0-6.2 8.5L3 16.8V21h4.2l1-1v-2h2v-2h2l1.9-1.9A6.5 6.5 0 1 0 14.5 3Zm2 4.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/>'; return el; };
   const coachLink = h('button', { class:'coachlink', type:'button', id:'iamcoach', 'aria-expanded':'false', 'aria-controls':'coachform', onclick: () => { coachForm.hidden = !coachForm.hidden; coachLink.setAttribute('aria-expanded', String(!coachForm.hidden)); if (!coachForm.hidden) setTimeout(() => inp.focus(), 30); } }, keyIcon(), 'I am a coach');
   const card = h('section', { class:'lock', 'aria-label':'Sign in' },
     h('div', { class:'lockhero' }, h('p', { class:'mono eyebrow' }, 'Engineering notebook'), title,
-      h('p', { class:'locksub' }, 'Tap your name to open your page. You only do this once on this device.')),
-    names, st,
+      h('p', { class:'locksub' }, 'Tap your name, then type your code. You only do this once on this device.')),
+    names, kidForm, st,
     h('div', { class:'lockfoot' }, coachLink, coachForm));
   (async () => {
     try {
@@ -1108,8 +1132,8 @@ function lockCard() {
         $('#brandSub').textContent = [r.team.number ? `Team #${r.team.number}` : null, 'FLL Challenge', r.team.season || 'BIOGLOW 2026–27'].filter(Boolean).join(' · ');
       }
       const colorOf = (k, i) => KID_COLORS[(Number.isInteger(k.i) ? k.i : i) % KID_COLORS.length];   // same color as inside the logbook (roster position)
-      names.replaceChildren(...(kids.length ? kids.map((k, i) => h('button', { class:'tile', type:'button', 'data-kid': k.id, style:`--kid:${colorOf(k, i)}`, onclick: () => signIn(k.id, `Opening ${k.name}’s page…`) },
-        h('span', { class:'tile-av', 'aria-hidden':'true' }, kidShort(k.name)), h('span', { class:'tile-name' }, k.name), h('span', { class:'tile-go', 'aria-hidden':'true' }, 'Open my page →'))) : [h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'No names yet. Ask your coach.')]));
+      names.replaceChildren(...(kids.length ? kids.map((k, i) => h('button', { class:'tile', type:'button', 'data-kid': k.id, 'aria-pressed':'false', style:`--kid:${colorOf(k, i)}`, onclick: () => pickKid({ id: k.id, name: k.name, color: colorOf(k, i) }) },
+        h('span', { class:'tile-av', 'aria-hidden':'true' }, kidShort(k.name)), h('span', { class:'tile-name' }, k.name), h('span', { class:'tile-go', 'aria-hidden':'true' }, 'That’s me →'))) : [h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'No names yet. Ask your coach.')]));
       if (r && r.error === 'not_set_up') { st.className = 'status err'; st.textContent = signInMsg({ code:'not_set_up' }); }
     } catch (err) {
       names.replaceChildren(h('p', { class:'muted', style:'grid-column:1/-1;margin:0' }, 'Could not load the names.'));
