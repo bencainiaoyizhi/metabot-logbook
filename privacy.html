@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Privacy – Metabot Logbook</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; padding: 32px 16px 64px; font: 17px/1.55 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1d2a26; background: #f4f6f5; }
+  main { max-width: 680px; margin: 0 auto; background: #fff; border: 1px solid #dfe5e2; border-radius: 16px; padding: 28px 28px 32px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  .sub { color: #5b6a65; margin: 0 0 20px; font-size: .95rem; }
+  h2 { font-size: 1.1rem; margin: 22px 0 6px; }
+  p, li { margin: 6px 0; }
+  a { color: #0e8584; }
+  .foot { margin-top: 26px; color: #5b6a65; font-size: .9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Privacy – Metabot Logbook</h1>
+  <p class="sub">The team engineering notebook of FIRST LEGO League Challenge Team Metabot (#76447). Last updated October 13, 2026.</p>
+
+  <h2>What this app is</h2>
+  <p>The Metabot Logbook is a private notebook used by one youth robotics team: its four team members and their coaches. It is not a public service. Only people who have the page address and a team member's name and code can open it.</p>
+
+  <h2>What is stored, and where</h2>
+  <ul>
+    <li>Entries the team writes (session notes, research, robot design notes), the team members' first names, and photos the team uploads of their builds and sketches.</li>
+    <li>Everything is stored in the lead coach's own Google account: one Google Sheet and one Google Drive folder. A Google Apps Script owned by the coach reads and writes them on the team's behalf. The Google permissions the script asks for (Drive, Sheets, and connecting to an external service) are used only for this.</li>
+    <li>Homework cards from the team's Trello board are read (never changed) so each member can see their tasks.</li>
+    <li>The web page itself is a static file hosted on GitHub Pages. It keeps a small cache of your own entries in your browser so that you can keep writing when the connection drops.</li>
+  </ul>
+
+  <h2>What is not collected</h2>
+  <ul>
+    <li>No analytics, no advertising, no tracking cookies, no accounts and no passwords beyond a team code.</li>
+    <li>No data is sold or shared with anyone outside the team and its coaches. Nothing is sent to third parties other than Google (storage), GitHub (hosting the page) and Trello (reading homework cards).</li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>The team members are children. Coaches and parents decide what is written and which photos are uploaded; faces are not needed and are discouraged. A parent can ask a coach to remove any entry or photo at any time.</p>
+
+  <h2>Deleting data</h2>
+  <p>Coaches can delete entries and photos from the logbook. The whole notebook can be deleted by removing the Google Sheet and Drive folder in the coach's account.</p>
+
+  <h2>Contact</h2>
+  <p>Questions go to the lead coach, who owns the Google account the data lives in. Team members and parents already have the coach's contact details.</p>
+
+  <p class="foot"><a href="./">Back to the logbook</a></p>
+</main>
+</body>
+</html>
